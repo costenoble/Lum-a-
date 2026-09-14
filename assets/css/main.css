@@ -1,0 +1,980 @@
+/* =====================================================================
+   TYPOGRAPHIE AUTO-HÉBERGÉE (à activer quand la licence est achetée)
+
+   Akaru auto-héberge « Alliance Neue / Alliance Platt » (Degarism Studio),
+   une police commerciale : elle ne peut pas être livrée avec ce dépôt.
+   Le jour où la licence est prise, déposer les .woff2 dans assets/fonts/,
+   décommenter ce bloc et remplacer la valeur de --font-display / --font-body
+   plus bas. Rien d'autre à changer : aucune règle n'appelle une police en dur.
+
+   @font-face {
+     font-family: 'Alliance Neue';
+     src: url('~/assets/fonts/AllianceNeue-Regular.woff2') format('woff2');
+     font-weight: 400;
+     font-display: swap;
+   }
+   @font-face {
+     font-family: 'Alliance Neue';
+     src: url('~/assets/fonts/AllianceNeue-Medium.woff2') format('woff2');
+     font-weight: 500;
+     font-display: swap;
+   }
+   @font-face {
+     font-family: 'Alliance Platt';
+     src: url('~/assets/fonts/AlliancePlatt-SemiBold.woff2') format('woff2');
+     font-weight: 600;
+     font-display: swap;
+   }
+
+   En attendant, Archivo + Inter (Google Fonts) tiennent le même rôle :
+   grotesque serrée pour le display, linéale neutre pour le texte courant.
+   Pour passer en auto-hébergé sans licence, `nuxt-google-fonts` sait aussi
+   télécharger et servir Archivo/Inter en local.
+   ===================================================================== */
+
+/* =====================================================================
+   DESIGN TOKENS
+   Palette quasi neutre facon agence : papier casse, encre presque noire,
+   un seul accent electrique. On reskinne ici, pas dans les composants.
+   ===================================================================== */
+:root {
+  --paper: #f3f2ef;
+  --paper-2: #e8e6e1;
+  --ink: #0f0f0f;
+  --ink-soft: #6b6b68;
+  --night: #0b0b0b;
+  --on-night: #f3f2ef;
+  --on-night-soft: #8d8d8a;
+  --accent: #ff5b1f;
+  --line: rgba(15, 15, 15, 0.14);
+  --line-dark: rgba(243, 242, 239, 0.16);
+
+  --font-display: 'Archivo', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --fs-hero: clamp(3rem, 11vw, 11rem);
+  --fs-giant: clamp(2.6rem, 8.5vw, 8rem);
+  --fs-h1: clamp(2.2rem, 5.2vw, 4.4rem);
+  --fs-h2: clamp(1.6rem, 3.2vw, 2.6rem);
+  --fs-lead: clamp(1.15rem, 2vw, 1.6rem);
+  --fs-body: 1rem;
+
+  --sp-2: 1rem;
+  --sp-3: 1.75rem;
+  --sp-4: 3rem;
+  --sp-5: 5rem;
+  --sp-6: clamp(5rem, 12vw, 11rem);
+
+  --container: 1440px;
+  --pad-inline: clamp(1.15rem, 4vw, 3.5rem);
+  --radius: 4px;
+  --ease-soft: cubic-bezier(0.22, 0.9, 0.32, 1);
+  --header-h: 84px;
+}
+
+/* =====================================================================
+   RESET / BASE
+   ===================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: auto;
+}
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+body.nav-locked {
+  overflow: hidden;
+}
+/* Curseur maison actif (pointeur fin, mouvement non réduit) : le curseur
+   système s'efface partout sauf sur les champs de saisie, où l'on garde le
+   curseur texte natif. */
+html.custom-cursor-on,
+html.custom-cursor-on * {
+  cursor: none !important;
+}
+html.custom-cursor-on input,
+html.custom-cursor-on textarea,
+html.custom-cursor-on select,
+html.custom-cursor-on [contenteditable] {
+  cursor: auto !important;
+}
+img,
+svg,
+video {
+  max-width: 100%;
+  display: block;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+h1,
+h2,
+h3,
+h4,
+p,
+figure {
+  margin: 0;
+}
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+  text-wrap: balance;
+}
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* =====================================================================
+   LAYOUT PRIMITIVES
+   ===================================================================== */
+.container {
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--pad-inline);
+}
+.section {
+  padding-block: var(--sp-6);
+}
+.section--tight {
+  padding-block: var(--sp-5);
+}
+.night {
+  background: var(--night);
+  color: var(--on-night);
+}
+.night .eyebrow,
+.night .muted {
+  color: var(--on-night-soft);
+}
+.night .rule {
+  background: var(--line-dark);
+}
+.rule {
+  height: 1px;
+  background: var(--line);
+  border: 0;
+  width: 100%;
+}
+.muted {
+  color: var(--ink-soft);
+}
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.eyebrow::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: none;
+}
+.lead {
+  font-size: var(--fs-lead);
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+  max-width: 26ch;
+}
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
+/* =====================================================================
+   LIENS / BOUTONS
+   ===================================================================== */
+.link-under {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 2px;
+}
+.link-under::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.5s var(--ease-soft);
+}
+.link-under:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.btn {
+  --btn-bg: var(--ink);
+  --btn-fg: var(--paper);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1rem 1.9rem;
+  border-radius: 999px;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  overflow: hidden;
+  isolation: isolate;
+  will-change: transform;
+}
+.btn span {
+  position: relative;
+  z-index: 1;
+}
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform: translateY(101%);
+  transition: transform 0.55s var(--ease-soft);
+  z-index: 0;
+}
+.btn:hover::before {
+  transform: translateY(0);
+}
+.btn:hover {
+  color: #fff;
+}
+.btn--ghost {
+  --btn-bg: transparent;
+  --btn-fg: currentColor;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.night .btn--ghost {
+  box-shadow: inset 0 0 0 1px var(--line-dark);
+}
+
+/* =====================================================================
+   MEDIA / PLACEHOLDERS
+   Les visuels sont des degrades generes (pas d'assets tiers). Remplacer
+   le composant Placeholder par une <img> garde exactement la meme boite.
+   ===================================================================== */
+.media {
+  position: relative;
+  overflow: hidden;
+  background: var(--paper-2);
+  border-radius: var(--radius);
+  /* Déclare le conteneur de requête : sans lui, le `cqw` de la lettre du
+     placeholder retombe sur le viewport et la lettre déborde des petites
+     boîtes (visible sur les slides réduites du carrousel). */
+  container-type: inline-size;
+}
+.media > img,
+.media > .ph {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ratio-4x5 {
+  aspect-ratio: 4 / 5;
+}
+.ratio-3x2 {
+  aspect-ratio: 3 / 2;
+}
+.ratio-16x9 {
+  aspect-ratio: 16 / 9;
+}
+.ratio-1x1 {
+  aspect-ratio: 1 / 1;
+}
+.reveal-mask {
+  overflow: hidden;
+}
+
+/* =====================================================================
+   TEXTE ANIME (v-lines)
+   Chaque ligne est enveloppee dans un masque, la ligne monte depuis le bas.
+   ===================================================================== */
+.line-mask {
+  display: block;
+  overflow: hidden;
+  /* Les capitales accentuées débordent de la boîte de ligne : on ouvre le
+     masque vers le haut, sinon l'accent du É est coupé net. */
+  padding-top: 0.14em;
+  margin-top: -0.14em;
+}
+.line-mask > span {
+  display: block;
+  will-change: transform;
+}
+
+/* =====================================================================
+   HEADER
+   Le header n'est plus un groupe de fusion global : seuls les éléments
+   purement typographiques portent `blend`, ce qui les garde lisibles
+   au-dessus des sections claires comme sombres. Le bouton menu, lui, doit
+   conserver ses vraies couleurs (noir puis accent), donc il reste en dehors.
+   ===================================================================== */
+.header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 60;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  /* Inversion sur le fond : le même header reste lisible au-dessus des
+     sections claires et des sections nuit, sans détection de scroll. */
+  mix-blend-mode: difference;
+  color: #fff;
+}
+.header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  width: 100%;
+}
+.header__brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.35rem;
+  letter-spacing: -0.05em;
+}
+
+/* =====================================================================
+   NAV PLEIN ECRAN
+   ===================================================================== */
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: var(--night);
+  color: var(--on-night);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: calc(var(--header-h) + 2rem) var(--pad-inline) 2rem;
+  clip-path: inset(0 0 100% 0);
+  visibility: hidden;
+}
+.nav-overlay__list a {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.9rem, 6.4vw, 4.6rem);
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+  transition: color 0.4s var(--ease-soft);
+}
+.nav-overlay__list li {
+  overflow: hidden;
+}
+.nav-overlay__list a:hover {
+  color: var(--accent);
+}
+/* Flèche diagonale : posée en retrait, elle vient se caler contre le mot au
+   survol — le repère « ce mot est un lien » sans souligné.
+   La diagonale se dessine d'un trait (dasharray) au lieu d'apparaître d'un
+   bloc : c'est l'étirement qui donne le mouvement, la tête suit. */
+.nav-overlay__itemArrow {
+  display: block;
+  flex: none;
+  margin-top: 0.3em;
+  opacity: 0;
+  transform: translate(-10px, 10px);
+  transition: opacity 0.3s linear, transform 0.55s var(--ease-soft);
+}
+.nav-overlay__arrowShaft {
+  /* longueur de la diagonale : hypoténuse de 16×16, arrondie au-dessus */
+  stroke-dasharray: 23;
+  stroke-dashoffset: 23;
+  transition: stroke-dashoffset 0.5s var(--ease-soft);
+}
+.nav-overlay__arrowHead {
+  opacity: 0;
+  transform-origin: 22px 6px;
+  transform: scale(0.4);
+  transition: opacity 0.25s linear 0.22s, transform 0.4s var(--ease-soft) 0.22s;
+}
+.nav-overlay__list a:hover .nav-overlay__itemArrow,
+.nav-overlay__list a.router-link-active .nav-overlay__itemArrow {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+.nav-overlay__list a:hover .nav-overlay__arrowShaft,
+.nav-overlay__list a.router-link-active .nav-overlay__arrowShaft {
+  stroke-dashoffset: 0;
+}
+.nav-overlay__list a:hover .nav-overlay__arrowHead,
+.nav-overlay__list a.router-link-active .nav-overlay__arrowHead {
+  opacity: 1;
+  transform: scale(1);
+}
+.nav-overlay__secondary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.6rem;
+  margin-top: var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--on-night-soft);
+}
+.nav-overlay__meta {
+  margin-top: var(--sp-3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-4);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--on-night-soft);
+}
+
+/* =====================================================================
+   TRANSITION DE PAGE
+   ===================================================================== */
+.transition-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  pointer-events: none;
+  /* le débordement volontaire des bandes (voir ci-dessous) est clippé ici */
+  overflow: hidden;
+}
+.transition-overlay span {
+  background: var(--night);
+  transform: scaleY(0);
+  will-change: transform;
+  /* Une largeur de viewport rarement divisible par 3 laisse un demi-pixel
+     entre les colonnes, où le fond papier de la page transparaît : un trait
+     blanc vertical pendant toute la transition. Chaque bande mord donc d'un
+     pixel sur sa voisine, et le rendu 3D du transform évite en plus le
+     liseré d'anti-aliasing sur les bords. */
+  width: calc(100% + 1px);
+  backface-visibility: hidden;
+}
+
+/* =====================================================================
+   HERO
+   ===================================================================== */
+.hero {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-block: calc(var(--header-h) + 3rem) 2.5rem;
+}
+.hero__title {
+  font-size: var(--fs-hero);
+  font-weight: 700;
+  line-height: 0.86;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+}
+.hero__title em {
+  font-style: normal;
+  color: var(--accent);
+}
+.hero__bottom {
+  margin-top: clamp(2rem, 6vw, 4.5rem);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: var(--sp-3);
+}
+.hero__scroll {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.hero__scroll i {
+  display: block;
+  width: 1px;
+  height: 34px;
+  background: var(--line);
+  position: relative;
+  overflow: hidden;
+}
+.hero__scroll i::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  animation: scroll-cue 1.8s var(--ease-soft) infinite;
+}
+@keyframes scroll-cue {
+  0% {
+    transform: translateY(-100%);
+  }
+  60%,
+  100% {
+    transform: translateY(100%);
+  }
+}
+@media (max-width: 700px) {
+  .hero__bottom {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =====================================================================
+   MANIFESTE (texte revele mot a mot au scroll)
+   ===================================================================== */
+.manifesto p {
+  font-family: var(--font-display);
+  overflow-wrap: break-word;
+  font-weight: 500;
+  font-size: clamp(1.5rem, 3.4vw, 3rem);
+  line-height: 1.18;
+  letter-spacing: -0.03em;
+  max-width: 20ch;
+}
+.manifesto .w {
+  color: var(--line);
+  transition: color 0.3s linear;
+}
+.manifesto .w.on {
+  color: var(--ink);
+}
+
+/* =====================================================================
+   PROJETS
+   ===================================================================== */
+.projects-stack {
+  display: grid;
+  gap: clamp(2.5rem, 6vw, 6rem);
+}
+.project-card {
+  display: grid;
+  gap: 1.1rem;
+}
+.project-card__media {
+  position: relative;
+}
+.project-card__media .ph,
+.project-card__media img {
+  transition: transform 0.9s var(--ease-soft);
+}
+.project-card:hover .ph,
+.project-card:hover img {
+  transform: scale(1.04);
+}
+.project-card__meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.project-card__title {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+}
+.project-card__tags {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+}
+.night .project-card__tags {
+  color: var(--on-night-soft);
+}
+.projects-stack--featured {
+  grid-template-columns: repeat(12, 1fr);
+  gap: clamp(2.5rem, 5vw, 5rem) 1.5rem;
+}
+.projects-stack--featured > *:nth-child(3n + 1) {
+  grid-column: 1 / span 8;
+}
+.projects-stack--featured > *:nth-child(3n + 2) {
+  grid-column: 10 / span 3;
+  align-self: end;
+}
+.projects-stack--featured > *:nth-child(3n + 3) {
+  grid-column: 3 / span 7;
+}
+@media (max-width: 900px) {
+  .projects-stack--featured {
+    grid-template-columns: 1fr;
+  }
+  .projects-stack--featured > * {
+    grid-column: 1 / -1 !important;
+  }
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: clamp(2rem, 4vw, 3.5rem);
+}
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.filters button {
+  padding: 0.6rem 1.1rem;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition: background 0.35s var(--ease-soft), color 0.35s var(--ease-soft);
+}
+.filters button[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--paper);
+}
+.filters sup {
+  color: var(--ink-soft);
+  margin-left: 0.35rem;
+}
+.filters button[aria-pressed='true'] sup {
+  color: rgba(243, 242, 239, 0.6);
+}
+
+/* =====================================================================
+   EXPERTISES (liste + visuel qui suit le curseur)
+   ===================================================================== */
+.xp-list {
+  border-top: 1px solid var(--line-dark);
+}
+.xp-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 4rem 1fr minmax(0, 34ch);
+  gap: var(--sp-3);
+  align-items: baseline;
+  padding-block: clamp(1.6rem, 3vw, 2.6rem);
+  border-bottom: 1px solid var(--line-dark);
+  transition: padding-left 0.5s var(--ease-soft), color 0.4s var(--ease-soft);
+}
+.xp-row:hover {
+  padding-left: 1.2rem;
+}
+.xp-row__idx {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--on-night-soft);
+}
+.xp-row__title {
+  font-size: clamp(1.6rem, 3.6vw, 3rem);
+  transition: color 0.4s var(--ease-soft);
+}
+.xp-row:hover .xp-row__title {
+  color: var(--accent);
+}
+.xp-row__desc {
+  color: var(--on-night-soft);
+  font-size: 0.95rem;
+}
+@media (max-width: 820px) {
+  .xp-row {
+    grid-template-columns: 3rem 1fr;
+  }
+  .xp-row__desc {
+    grid-column: 2;
+  }
+}
+.xp-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 260px;
+  height: 320px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 40;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.85);
+}
+@media (max-width: 900px) {
+  .xp-cursor {
+    display: none;
+  }
+}
+
+/* =====================================================================
+   AWARDS / CHIFFRES
+   ===================================================================== */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--sp-3);
+}
+.stat__num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+}
+.stat__label {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-top: 0.6rem;
+}
+.night .stat__label {
+  color: var(--on-night-soft);
+}
+.awards-list li {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 1.5rem;
+  align-items: baseline;
+  padding-block: 1.1rem;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+.night .awards-list li {
+  border-color: var(--line-dark);
+}
+
+/* =====================================================================
+   MARQUEE
+   ===================================================================== */
+.marquee {
+  overflow: hidden;
+  display: flex;
+  white-space: nowrap;
+  padding-block: clamp(1.5rem, 3vw, 2.5rem);
+  border-block: 1px solid var(--line);
+}
+.night .marquee {
+  border-color: var(--line-dark);
+}
+.marquee__track {
+  display: flex;
+  gap: 2rem;
+  will-change: transform;
+  padding-right: 2rem;
+}
+.marquee__item {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2rem, 6vw, 5rem);
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.marquee__item::after {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex: none;
+}
+
+/* =====================================================================
+   CTA GEANT
+   ===================================================================== */
+.cta-giant {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-giant);
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+  transition: color 0.4s var(--ease-soft);
+}
+.cta-giant:hover {
+  color: var(--accent);
+}
+
+/* =====================================================================
+   FOOTER
+   ===================================================================== */
+.footer {
+  padding-block: var(--sp-5) 2rem;
+}
+.footer__cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+  font-size: 0.95rem;
+}
+.footer__cols h4 {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--on-night-soft);
+  margin-bottom: 1rem;
+}
+.footer__cols li + li {
+  margin-top: 0.5rem;
+}
+.footer__bottom {
+  margin-top: var(--sp-5);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--on-night-soft);
+  text-transform: uppercase;
+}
+
+/* =====================================================================
+   PAGE PROJET
+   ===================================================================== */
+.case-head {
+  padding-block: calc(var(--header-h) + 5rem) var(--sp-4);
+}
+.case-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--sp-3);
+  padding-block: var(--sp-4);
+  border-top: 1px solid var(--line);
+}
+.case-meta dt {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 0.5rem;
+}
+.case-meta dd {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.case-body {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: clamp(2rem, 5vw, 4.5rem) 1.5rem;
+}
+.case-body .col-6 {
+  grid-column: span 6;
+}
+.case-body .col-7 {
+  grid-column: span 7;
+}
+.case-body .col-5 {
+  grid-column: span 5;
+}
+.case-body .col-full {
+  grid-column: 1 / -1;
+}
+@media (max-width: 900px) {
+  .case-body > * {
+    grid-column: 1 / -1 !important;
+  }
+}
+.next-case {
+  display: block;
+  padding-block: var(--sp-5);
+  text-align: center;
+}
+
+/* =====================================================================
+   FORMULAIRE CONTACT
+   ===================================================================== */
+.form {
+  display: grid;
+  gap: var(--sp-3);
+  max-width: 640px;
+}
+.field label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 0.6rem;
+}
+.field input,
+.field textarea {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 0.8rem 0;
+  outline: none;
+  transition: border-color 0.35s var(--ease-soft);
+}
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--accent);
+}
+.field textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

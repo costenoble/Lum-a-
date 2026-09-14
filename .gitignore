@@ -1,0 +1,10 @@
+node_modules
+.nuxt
+.output
+.data
+dist
+.env
+
+# Reference stock asset (Freepik/macrovector) kept locally for Blender
+# modeling only - its own README says it must not be published.
+blender/reference/

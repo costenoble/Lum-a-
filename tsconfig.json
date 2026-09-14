@@ -1,0 +1,8 @@
+{
+  "extends": "./.nuxt/tsconfig.json",
+  // ExpandingCarousel.tsx est le composant React de référence, gardé comme
+  // source d'inspiration : il n'est pas compilé (la version Vue vit dans
+  // components/). Ne pas ajouter d'autre "exclude" ici — écraser celui de
+  // Nuxt retirerait .nuxt du périmètre et casserait tous les auto-imports.
+  "exclude": ["ExpandingCarousel.tsx"]
+}
