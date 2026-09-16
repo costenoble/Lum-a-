@@ -38,6 +38,7 @@
                   :color="slot.color"
                   :color2="slot.color2"
                   ratio="4x5"
+                  :filter="slot.renderFilter"
                 />
                 <span class="slot__name">{{ slot.name }}</span>
               </button>

@@ -21,6 +21,7 @@
               :color="line.drink.color"
               :color2="line.drink.color2"
               ratio="1x1"
+              :filter="line.drink.renderFilter"
             />
           </div>
 

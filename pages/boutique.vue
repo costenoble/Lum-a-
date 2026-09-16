@@ -20,6 +20,7 @@
               :color="drink.color"
               :color2="drink.color2"
               ratio="1x1"
+              :filter="drink.renderFilter"
             />
           </NuxtLink>
 

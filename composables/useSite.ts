@@ -55,6 +55,9 @@ export interface Drink {
   color2: string
   /** Render Blender attendu dans /public/renders/. Vide = placeholder. */
   render: string
+  /** Filtre CSS optionnel appliqué sur le render (ex. recolorer une vraie
+      photo neutre vers la teinte signature quand aucun vrai render n'existe). */
+  renderFilter?: string
   /** Modèle glTF/glb exporté depuis Blender, dans /public/models/. Vide =
       bouteille procédurale générée par BottleCanvas. */
   model3d?: string
@@ -156,7 +159,11 @@ export const drinks: Drink[] = [
     pack: 'Pack de 6 · 25 cl',
     color: '#2fc4c0',
     color2: '#9ef0e6',
-    render: '',
+    render: '/renders/lagon.jpg',
+    // Pas de vraie boisson bleu-vert sans alcool ni marque visible trouvée en
+    // photo libre de droits : on recolore une vraie photo de bouteille (jus
+    // rouge neutre) vers la teinte signature plutot que d'inventer un rendu.
+    renderFilter: 'hue-rotate(185deg) saturate(2.4) brightness(1.4)',
     intro:
       'La bouteille qu’on emporte à la plage. Poire williams, un trait de citron vert, des bulles minuscules.',
     story: [
@@ -231,31 +238,36 @@ export const expertises = [
     idx: '01',
     title: 'Recette',
     desc: 'Formulation sans sucres ajoutés, validée par un panel de goûteurs de 3 à 10 ans.',
-    color: '#ff8a3d'
+    color: '#ff8a3d',
+    image: '/expertise/recette.jpg'
   },
   {
     idx: '02',
     title: 'Direction artistique',
     desc: 'Un univers graphique qui parle aux enfants sans infantiliser les parents.',
-    color: '#ff4f79'
+    color: '#ff4f79',
+    image: '/expertise/direction-artistique.jpg'
   },
   {
     idx: '03',
     title: 'Packaging',
     desc: 'Verre consigné, étiquette monomatière, format pensé pour une main de cinq ans.',
-    color: '#4fbf7a'
+    color: '#4fbf7a',
+    image: '/expertise/packaging.jpg'
   },
   {
     idx: '04',
     title: 'Image 3D',
     desc: 'Chaque bouteille est modélisée et rendue sous Blender avant d’exister en verre.',
-    color: '#7b6cf6'
+    color: '#7b6cf6',
+    image: '/renders/solaire.jpg'
   },
   {
     idx: '05',
     title: 'Retail & digital',
     desc: 'Du linéaire épicerie fine au site marchand, une seule et même grammaire visuelle.',
-    color: '#2fc4c0'
+    color: '#2fc4c0',
+    image: '/expertise/retail-digital.jpg'
   }
 ]
 

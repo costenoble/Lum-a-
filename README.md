@@ -19,7 +19,7 @@ npm run generate # version 100 % statique
 | --- | --- |
 | `/` | Hero, manifeste, carrousel des six parfums, 3 nouveautés, savoir-faire, chiffres, teaser studio |
 | `/boissons` | Grille filtrable par gamme |
-| `/fabrication` | Scrollytelling 3D : la bouteille se fabrique au rythme du scroll |
+| `/fabrication` | Scrollytelling 3D : la caméra traverse en continu un couloir de bananes (glb importé), au rythme du scroll |
 | `/coffret` | Composeur de coffret six bouteilles, partageable par URL |
 | `/boutique` | Packs, prix, ajout au panier (tiroir latéral) |
 | `/panier` | Page panier : lignes animées, récap, jauge de franco, confirmation |
@@ -47,8 +47,9 @@ npm run generate # version 100 % statique
   la souris et devient une pastille libellée au survol de tout élément portant
   `data-cursor="Voir"`. Inactif au tactile et en `prefers-reduced-motion`.
 - **Fabrication en 3D au scroll** ([components/FabricationScene.vue](components/FabricationScene.vue)) :
-  un bloc haut, un visuel collant, et la position de scroll qui pilote la scène Three.js.
-  Voir « La bouteille 3D » plus bas.
+  un bloc haut, un visuel collant, et la position de scroll qui pilote la scène Three.js. La
+  scène elle-même (une banane importée de Blender, caméra en vol) vit dans
+  [components/BananaStage.vue](components/BananaStage.vue) — voir « La banane 3D » plus bas.
 - **Composeur de coffret** ([pages/coffret.vue](pages/coffret.vue)) : six casiers, la bouteille
   tombe dans son emplacement, le halo de la caisse mélange les couleurs choisies, le prix roule.
   La composition est encodée dans l'URL (`?c=solaire-comete-…`), donc un coffret se partage par
@@ -175,6 +176,104 @@ profiler sans lui.
 
 Quand les vrais modèles Blender arriveront, `useGLTF` de `@tresjs/cientos` remplace `BottleModel`
 sans toucher au reste.
+
+## La banane 3D (glb importé)
+
+Contrairement à la bouteille, entièrement procédurale, la banane de `/fabrication` est un vrai
+modèle Blender (1,7 Mo, textures 2048 px). Une variante compressée meshopt à 130 Ko existe dans
+`blender/banane/` — elle descend les textures à 1024 px, ce qui se voit pendant les passages
+rasants où le fruit remplit l'écran. Pour y repasser, il suffit de changer `MODEL_URL` : le
+décodeur meshopt reste branché.
+
+```bash
+npx @gltf-transform/cli optimize banane.glb banane.min.glb --compress meshopt --texture-size 1024
+```
+
+| Fichier | Rôle |
+| --- | --- |
+| [components/BananaField.vue](components/BananaField.vue) | charge le glb une fois, pousse l'anisotropie des textures au maximum, et en dispose une douzaine d'exemplaires le long du couloir (`clone()` : géométrie et matériaux partagés) |
+| [components/BananaStage.vue](components/BananaStage.vue) | le décor (lumières, `StudioEnvironment`, `BottlePostFX`) et la caméra, qui descend le couloir en continu |
+
+Le glb est complet : couleur, rugosité et normales sont bakées dedans (WebP intégré), il n'y a
+donc aucune texture à poser à la main. Seule contrainte : la compression meshopt demande un
+décodeur que `useGLTF` de `@tresjs/cientos` ne branche pas — d'où le `GLTFLoader` monté
+directement dans `BananaField`, avec le `MeshoptDecoder` livré par Three.
+
+### Pourquoi un couloir plutôt qu'une orbite
+
+La contrainte est arithmétique, pas esthétique. La texture est bakée en 2048 px pour 19 cm de
+fruit, soit ~8 300 px/m. Un écran de 1400 px affichant la banane **entière**, c'est ~7 300 px/m :
+net. Si elle déborde et qu'on n'en voit que la moitié, on passe à ~14 600 px/m — près du double
+de ce que la texture contient. Aucun éclairage ni post-traitement ne réinvente des pixels
+absents : **tourner autour d'un fruit unique interdit donc de s'en approcher**, ce qui rend vite
+le mouvement tiède.
+
+D'où la traversée. Une douzaine d'exemplaires dispersés en profondeur, la caméra avance en
+continu, et surtout **la mise au point reste fixée à distance constante devant elle** : ce qui
+frôle l'objectif est hors focus, comme un vrai premier plan de cinéma. Le flou devient un parti
+pris de cadrage au lieu d'un manque de finesse, et il y a toujours un fruit à bonne distance,
+net et plein cadre. L'immersion vient d'être *dedans* et du parallaxe, plus de la proximité.
+
+Deux pistes écartées en chemin, pour mémoire : l'orbite rapprochée, qui exposait les limites de
+la texture, et une variante où la caméra **s'arrêtait** sur chaque cadrage le temps de la lecture
+— plus lisible sur le papier, mais elle cassait net la sensation d'immersion.
+
+### Post-traitement : une panne silencieuse
+
+`BottlePostFX` importait `EffectComposer` là où les effets `*Pmndrs` s'enregistrent auprès de
+`EffectComposerPmndrs`, via une injection que le premier ne fournit pas. Conséquence : **aucun
+effet n'était appliqué**, ni ici ni sur le hero bouteille. Rien ne plantait — seul un
+avertissement Vue signalant une injection introuvable passait dans la console, et le rendu
+restait correct, juste brut. Les valeurs documentées avaient donc été réglées à l'aveugle :
+activées telles quelles, elles saturaient l'image de grain.
+
+Chaque effet est désormais **éteint par défaut** et activable par prop : tout rallumer d'un coup
+changerait l'aspect de scènes que personne n'a demandé à retoucher. La page fabrication allume
+bloom (seuil haut), vignette et profondeur de champ. Trois points à connaître :
+
+- **Le bloom déborde sur les sujets clairs.** Un seuil bas (0,55, calé sur le verre sombre de la
+  bouteille) est dépassé sur *toute* la surface d'un fruit jaune, qui se retrouve délavé.
+- **La profondeur de champ exige le tampon de profondeur** (`:depth-buffer`) *et* des plans de
+  coupe serrés. Avec le `far` par défaut de Three, qui se compte en milliers d'unités, la
+  précision de profondeur est telle que l'effet ne floute quasiment rien.
+- **Le grain n'a pas de réglage d'intensité** : c'est le mode de fusion qui dose. `OVERLAY`
+  sature, `SOFT_LIGHT` reste discret.
+
+### Netteté du fruit
+
+Par ordre d'effet réel, si la peau paraît molle ou délavée : le bloom d'abord (voir ci-dessus),
+puis **l'intensité des lumières** — le trio du studio est réglé pour du verre, sur un fruit jaune
+il partait en surexposition (divisé par ~1,6, exposition à 0,95) — puis **l'anisotropie des
+textures**, que Three laisse à 1 par défaut, ce qui transforme en bouillie toute surface vue de
+biais (`getMaxAnisotropy()` sur chaque texture au chargement).
+
+Les sources Blender (dont le `.blend`, les textures 2048 px et les composants React Three Fiber
+fournis avec le modèle) sont dans `blender/banane/`. Ce dossier est exclu du typecheck : ces
+`.tsx` sont écrits pour React, pas pour TresJS, et ne compileraient pas ici.
+
+Pièges rencontrés en construisant ces scènes, à ajouter à la liste de ceux de la
+bouteille :
+
+- **Une caméra qui bouge ne redemande pas d'image à elle seule.** Changer `:position` sur
+  `TresPerspectiveCamera` ne suffit pas en `render-mode="on-demand"` : sans un
+  `renderer.invalidate()` explicite à chaque tick de `progress` (voir le `watch` dans
+  `BananaField`), le canevas affiche une seule image puis reste figé — ou vide, si ce premier
+  rendu a eu lieu avant la fin du chargement du modèle. Constaté par un canevas obstinément blanc
+  malgré une scène par ailleurs correcte (bounding box, matériaux, aucune erreur console).
+- **`look-at` ne recalcule l'orientation que si sa référence change.** Une cible fixe passée comme
+  une constante (`new Vector3(...)` créée une seule fois) ne déclenche `camera.lookAt()` qu'au
+  tout premier rendu : la caméra garde ensuite l'orientation de départ en se déplaçant le long de
+  la spline, et sort du cadre dès qu'elle s'éloigne de sa position initiale. Il faut un `computed`
+  qui recrée un nouveau `Vector3` à chaque changement de `progress`, même si la valeur pointée ne
+  change jamais.
+- **Sur une trajectoire en spline, ce sont les segments qu'il faut surveiller, pas les points.**
+  Vaut pour l'orbite abandonnée, et pour toute reprise du genre. Un objet allongé couché sur
+  l'axe X se filme de bout — écrasé — depuis toute position à fort |x| et faible |z| ; or on peut
+  placer huit points de contrôle irréprochables et voir quand même la caméra traverser l'axe
+  *entre* deux d'entre eux. Même mécanique pour la distance : deux points assez éloignés ne
+  garantissent pas un segment assez éloigné, la corde coupant par l'intérieur. Dans les deux cas
+  le diagnostic est venu de la lecture des valeurs réelles à plusieurs points du scroll, pas de
+  l'œil.
 
 ## Packshots Blender (optionnel)
 

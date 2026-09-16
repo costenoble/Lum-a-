@@ -1,13 +1,7 @@
 <template>
   <div class="fab" ref="wrap" :style="{ '--fab-scroll': `${scrollVh}vh` }">
     <div class="fab__sticky">
-      <BottleStage
-        class="fab__stage"
-        :color="color"
-        :color2="color2"
-        :name="name"
-        :progress="progress"
-      />
+      <BananaStage class="fab__stage" :progress="progress" />
       <slot :progress="progress" />
     </div>
   </div>
@@ -17,23 +11,20 @@
 import gsap from 'gsap'
 
 // ---------------------------------------------------------------------------
-// Fabrication de la bouteille, en 3D temps réel, pilotée par le scroll.
+// Vol de caméra autour de la banane, en 3D temps réel, piloté par le scroll.
 //
 // Le composant ne connaît que deux choses : la hauteur de défilement du bloc,
-// et la valeur d'avancement qu'il en tire. Tout le reste — niveau du liquide,
-// enroulement de l'étiquette, descente de la capsule — est déclaré dans
-// BottleModel, qui dérive tout de `progress`.
+// et la valeur d'avancement qu'il en tire. Tout le reste — la trajectoire en
+// spline, le champ de vision, la cible — est déclaré dans BananaStage, qui
+// dérive tout de `progress`. Le fruit lui-même ne bouge jamais.
 // ---------------------------------------------------------------------------
 
 withDefaults(
   defineProps<{
-    color?: string
-    color2?: string
-    name?: string
     /** Hauteur de défilement du bloc, en vh. Plus haut = plus lent. */
     scrollVh?: number
   }>(),
-  { color: '#ff8a3d', color2: '#ffd166', name: 'Luméa', scrollVh: 420 }
+  { scrollVh: 420 }
 )
 
 const emit = defineEmits<{ progress: [number] }>()
@@ -48,7 +39,7 @@ onMounted(() => {
   if (!host) return
 
   if ($reduceMotion) {
-    // Pas de scrub : la bouteille finie, tout de suite.
+    // Pas de scrub : le cadrage final, tout de suite.
     progress.value = 1
     emit('progress', 1)
     return

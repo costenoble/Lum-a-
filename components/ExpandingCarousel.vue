@@ -16,6 +16,7 @@
           :color2="item.color2"
           ratio="4x5"
           :alt="item.alt ?? item.title"
+          :filter="item.filter"
         />
       </div>
 
@@ -63,6 +64,8 @@ export interface CarouselItem {
   alt?: string
   /** Render Blender ; vide = dégradé signature du parfum. */
   render?: string
+  /** Filtre CSS optionnel appliqué au render (cf. Drink.renderFilter). */
+  filter?: string
   color: string
   color2: string
   /** Destination du lien affiché sur la slide active. */

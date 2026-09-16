@@ -1,6 +1,6 @@
 <template>
   <figure class="media" :class="`ratio-${ratio}`">
-    <img v-if="src" :src="src" :alt="alt" loading="lazy" />
+    <img v-if="src" :src="src" :alt="alt" loading="lazy" :style="imgStyle" />
 
     <!-- Emplacement render : dégradé signature du parfum + halo + initiale.
          Dès que le PNG Blender existe, on passe `src` et la boîte ne bouge pas. -->
@@ -21,17 +21,23 @@ const props = withDefaults(
     color?: string
     color2?: string
     ratio?: '4x5' | '3x2' | '16x9' | '1x1'
+    /** Filtre CSS optionnel (ex. recolorer une photo neutre vers la teinte
+        signature quand aucun vrai render n'existe pour ce parfum). */
+    filter?: string
   }>(),
   {
     src: '',
     alt: '',
     color: '#ff5b1f',
     color2: '#ffd166',
-    ratio: '4x5'
+    ratio: '4x5',
+    filter: ''
   }
 )
 
 const alt = computed(() => props.alt || `Bouteille Luméa ${props.label}`)
+
+const imgStyle = computed(() => (props.filter ? { filter: props.filter } : undefined))
 
 const phStyle = computed(() => ({
   '--c1': props.color,

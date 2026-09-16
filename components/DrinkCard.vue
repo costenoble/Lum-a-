@@ -7,6 +7,7 @@
         :color="drink.color"
         :color2="drink.color2"
         :ratio="ratio"
+        :filter="drink.renderFilter"
       />
     </div>
 

@@ -49,6 +49,7 @@
             :color2="drink.color2"
             ratio="1x1"
             :alt="`Render 3D ${drink.name}`"
+            :filter="drink.renderFilter"
           />
         </div>
       </div>

@@ -14,8 +14,10 @@
       </li>
     </ul>
 
-    <!-- Vignette qui suit le curseur, teintée par l'expertise survolée. -->
+    <!-- Vignette qui suit le curseur : une photo par expertise, teintée par
+         sa couleur signature. -->
     <div class="xp-cursor" ref="cursor" aria-hidden="true">
+      <img :src="activeXp.image" alt="" class="xp-cursor__img" />
       <div class="xp-cursor__fill" :style="fillStyle" />
     </div>
   </div>
@@ -28,10 +30,14 @@ const cursor = ref<HTMLElement | null>(null)
 const active = ref(0)
 const { $reduceMotion } = useNuxtApp()
 
+const activeXp = computed(() => expertises[active.value]!)
+
+// Lavis de couleur au-dessus de la photo plutôt qu'un dégradé plein : on
+// garde l'identité "teintée par l'expertise" sans cacher l'image dessous.
 const fillStyle = computed(() => {
-  const xp = expertises[active.value]!
+  const xp = activeXp.value
   return {
-    background: `radial-gradient(120% 100% at 50% 110%, ${xp.color} 0%, transparent 65%), linear-gradient(200deg, ${xp.color} 0%, #0b0b0b 100%)`
+    background: `radial-gradient(120% 100% at 50% 110%, ${xp.color} 0%, transparent 65%), linear-gradient(200deg, color-mix(in oklab, ${xp.color} 55%, transparent) 0%, transparent 70%)`
   }
 })
 
@@ -66,8 +72,18 @@ function move(e: MouseEvent) {
 </script>
 
 <style scoped>
-.xp-cursor__fill {
+.xp-cursor__img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
+  object-fit: cover;
+}
+.xp-cursor__fill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  mix-blend-mode: multiply;
 }
 </style>

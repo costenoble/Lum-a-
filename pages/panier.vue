@@ -30,6 +30,7 @@
             :color="drink.color"
             :color2="drink.color2"
             ratio="4x5"
+            :filter="drink.renderFilter"
           />
         </NuxtLink>
       </div>
@@ -60,6 +61,7 @@
                 :color="line.drink.color"
                 :color2="line.drink.color2"
                 ratio="1x1"
+                :filter="line.drink.renderFilter"
               />
             </NuxtLink>
 

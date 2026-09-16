@@ -167,6 +167,7 @@ const carouselItems = computed(() =>
     subtitle: drink.fruit,
     alt: `Bouteille Luméa ${drink.name}`,
     render: drink.render,
+    filter: drink.renderFilter,
     color: drink.color,
     color2: drink.color2,
     to: `/boissons/${drink.slug}`

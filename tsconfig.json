@@ -2,7 +2,10 @@
   "extends": "./.nuxt/tsconfig.json",
   // ExpandingCarousel.tsx est le composant React de référence, gardé comme
   // source d'inspiration : il n'est pas compilé (la version Vue vit dans
-  // components/). Ne pas ajouter d'autre "exclude" ici — écraser celui de
-  // Nuxt retirerait .nuxt du périmètre et casserait tous les auto-imports.
-  "exclude": ["ExpandingCarousel.tsx"]
+  // components/). blender/ est du matériel source (scripts Blender, et les
+  // composants React Three Fiber livrés avec le modèle de banane) : rien
+  // là-dedans ne fait partie du site, et ces .tsx ne compileraient pas ici.
+  // Attention : ne rien retirer de cette liste sans vérifier que .nuxt reste
+  // dans le périmètre, sous peine de casser tous les auto-imports.
+  "exclude": ["ExpandingCarousel.tsx", "blender"]
 }

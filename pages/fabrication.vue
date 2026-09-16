@@ -3,22 +3,17 @@
     <section class="container page-head">
       <p class="eyebrow" v-reveal>Fabrication</p>
       <h1 v-lines="0.05" style="font-size: var(--fs-hero); margin-top: 1.5rem">
-        <span class="line-mask"><span>Quatre gestes,</span></span>
-        <span class="line-mask"><span>une <em>bouteille</em></span></span>
+        <span class="line-mask"><span>Traversée</span></span>
+        <span class="line-mask"><span>d'un <em>régime</em></span></span>
       </h1>
       <p class="lead" v-reveal="0.4" style="margin-top: 2rem">
-        Du fruit pressé à la capsule vissée. Faites défiler : la bouteille se fabrique
-        sous vos yeux, en 3D, au rythme de votre scroll.
+        Faites défiler : la caméra avance, sans jamais s'arrêter, au milieu des fruits.
+        Un seul plan continu — ce qui passe trop près sort de la mise au point.
       </p>
     </section>
 
     <!-- La scène occupe tout l'écran ; les légendes suivent l'avancement. -->
-    <FabricationScene
-      :color="hero.color"
-      :color2="hero.color2"
-      :name="site.name"
-      @progress="onProgress"
-    >
+    <FabricationScene @progress="onProgress">
       <div class="steps" aria-hidden="true">
         <p class="steps__index">{{ String(currentStep + 1).padStart(2, '0') }} / 04</p>
 
@@ -72,28 +67,26 @@
 <script setup lang="ts">
 useHead({ title: 'Fabrication — Luméa' })
 
-const hero = drinks[0]!
-
 const steps = [
   {
-    title: 'Presser',
-    desc: 'Les fruits arrivent entiers le matin et passent au pressoir dans la journée. Rien n’est chauffé, la couleur reste celle du fruit.'
+    title: 'Entrée',
+    desc: 'On s’avance dans le couloir. Les premiers fruits passent tout près de l’objectif, hors de la zone de netteté.'
   },
   {
-    title: 'Remplir',
-    desc: 'Mise en bouteille sous 48 h, à froid. Le niveau est calé au millimètre : une main de cinq ans doit pouvoir la tenir pleine.'
+    title: 'À hauteur de fruit',
+    desc: 'Chaque banane traverse le champ à son tour : nervures dans la longueur, taches de maturité, vert qui reste à la pointe.'
   },
   {
-    title: 'Étiqueter',
-    desc: 'Étiquette monomatière, encre végétale, collée sur un seul tour. Elle se retire d’un geste au retour de la consigne.'
+    title: 'Au cœur',
+    desc: 'Le défilement porte au milieu du couloir. Devant, derrière, la profondeur se lit d’un seul coup d’œil.'
   },
   {
-    title: 'Sceller',
-    desc: 'Capsule métal vissée, joint sans plastique. La bouteille repart en caisse consignée vers ses 240 points de vente.'
+    title: 'Sortie',
+    desc: 'La traversée s’achève, les derniers fruits s’écartent et laissent le passage.'
   }
 ]
 
-// Les bornes suivent celles des gestes de FabricationScene.
+// Les bornes suivent les points de passage de la spline caméra (BananaStage).
 const BOUNDS = [0, 0.28, 0.55, 0.78]
 
 const progress = ref(0)

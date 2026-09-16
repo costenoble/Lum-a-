@@ -28,6 +28,7 @@
           :color="drink.color"
           :color2="drink.color2"
           ratio="16x9"
+          :filter="drink.renderFilter"
         />
       </div>
 
@@ -79,6 +80,7 @@
             :color2="drink.color"
             ratio="4x5"
             :alt="`Détail de l’étiquette ${drink.name}`"
+            :filter="drink.renderFilter"
           />
         </div>
         <div class="col-6 reveal-mask" v-reveal="0.1">

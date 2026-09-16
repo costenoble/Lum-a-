@@ -69,6 +69,7 @@
   --container: 1440px;
   --pad-inline: clamp(1.15rem, 4vw, 3.5rem);
   --radius: 4px;
+  --radius-photo: 20px;
   --ease-soft: cubic-bezier(0.22, 0.9, 0.32, 1);
   --header-h: 84px;
 }
@@ -115,6 +116,10 @@ svg,
 video {
   max-width: 100%;
   display: block;
+}
+img,
+video {
+  border-radius: var(--radius-photo);
 }
 a {
   color: inherit;
@@ -303,7 +308,7 @@ h4 {
   position: relative;
   overflow: hidden;
   background: var(--paper-2);
-  border-radius: var(--radius);
+  border-radius: var(--radius-photo);
   /* Déclare le conteneur de requête : sans lui, le `cqw` de la lettre du
      placeholder retombe sur le viewport et la lettre déborde des petites
      boîtes (visible sur les slides réduites du carrousel). */
@@ -733,7 +738,7 @@ h4 {
   left: 0;
   width: 260px;
   height: 320px;
-  border-radius: var(--radius);
+  border-radius: var(--radius-photo);
   overflow: hidden;
   pointer-events: none;
   z-index: 40;
