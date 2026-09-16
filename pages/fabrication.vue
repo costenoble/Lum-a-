@@ -4,7 +4,7 @@
       <p class="eyebrow" v-reveal>Fabrication</p>
       <h1 v-lines="0.05" style="font-size: var(--fs-hero); margin-top: 1.5rem">
         <span class="line-mask"><span>Traversée</span></span>
-        <span class="line-mask"><span>d'un <em>régime</em></span></span>
+        <span class="line-mask"><span>du <em>verger</em></span></span>
       </h1>
       <p class="lead" v-reveal="0.4" style="margin-top: 2rem">
         Faites défiler : la caméra avance, sans jamais s'arrêter, au milieu des fruits.
@@ -74,7 +74,7 @@ const steps = [
   },
   {
     title: 'À hauteur de fruit',
-    desc: 'Chaque banane traverse le champ à son tour : nervures dans la longueur, taches de maturité, vert qui reste à la pointe.'
+    desc: 'Chaque fruit traverse le champ à son tour : nervures de la banane, grains de la fraise, taches de maturité.'
   },
   {
     title: 'Au cœur',

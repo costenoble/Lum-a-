@@ -48,8 +48,9 @@ npm run generate # version 100 % statique
   `data-cursor="Voir"`. Inactif au tactile et en `prefers-reduced-motion`.
 - **Fabrication en 3D au scroll** ([components/FabricationScene.vue](components/FabricationScene.vue)) :
   un bloc haut, un visuel collant, et la position de scroll qui pilote la scène Three.js. La
-  scène elle-même (une banane importée de Blender, caméra en vol) vit dans
-  [components/BananaStage.vue](components/BananaStage.vue) — voir « La banane 3D » plus bas.
+  scène elle-même (un couloir de bananes et de fraises importées de Blender, caméra en
+  traversée continue) vit dans [components/BananaStage.vue](components/BananaStage.vue) — voir
+  « Le couloir de fruits » plus bas.
 - **Composeur de coffret** ([pages/coffret.vue](pages/coffret.vue)) : six casiers, la bouteille
   tombe dans son emplacement, le halo de la caisse mélange les couleurs choisies, le prix roule.
   La composition est encodée dans l'URL (`?c=solaire-comete-…`), donc un coffret se partage par
@@ -177,13 +178,14 @@ profiler sans lui.
 Quand les vrais modèles Blender arriveront, `useGLTF` de `@tresjs/cientos` remplace `BottleModel`
 sans toucher au reste.
 
-## La banane 3D (glb importé)
+## Le couloir de fruits (glb importés)
 
-Contrairement à la bouteille, entièrement procédurale, la banane de `/fabrication` est un vrai
-modèle Blender (1,7 Mo, textures 2048 px). Une variante compressée meshopt à 130 Ko existe dans
-`blender/banane/` — elle descend les textures à 1024 px, ce qui se voit pendant les passages
-rasants où le fruit remplit l'écran. Pour y repasser, il suffit de changer `MODEL_URL` : le
-décodeur meshopt reste branché.
+Contrairement à la bouteille, entièrement procédurale, les fruits de `/fabrication` sont de vrais
+modèles Blender : la banane (1,7 Mo, textures 2048 px complètes) et la fraise (glb + une seule
+texture couleur, le reste posé à la main — voir plus bas). Une variante compressée meshopt de la
+banane, à 130 Ko, existe dans `blender/banane/` : elle descend les textures à 1024 px, ce qui se
+voit dès qu'un fruit s'approche de l'objectif. Pour y repasser, changer `BANANA_URL` dans
+`FruitField` ; le décodeur meshopt reste branché.
 
 ```bash
 npx @gltf-transform/cli optimize banane.glb banane.min.glb --compress meshopt --texture-size 1024
@@ -191,13 +193,15 @@ npx @gltf-transform/cli optimize banane.glb banane.min.glb --compress meshopt --
 
 | Fichier | Rôle |
 | --- | --- |
-| [components/BananaField.vue](components/BananaField.vue) | charge le glb une fois, pousse l'anisotropie des textures au maximum, et en dispose une douzaine d'exemplaires le long du couloir (`clone()` : géométrie et matériaux partagés) |
+| [components/FruitField.vue](components/FruitField.vue) | charge chaque glb une seule fois, pousse l'anisotropie des textures au maximum, pose la couleur de la fraise à la main, et en dispose une douzaine d'exemplaires le long du couloir (`clone()` : géométrie et matériaux partagés, deux chargements réseau quel que soit le nombre de fruits) |
 | [components/BananaStage.vue](components/BananaStage.vue) | le décor (lumières, `StudioEnvironment`, `BottlePostFX`) et la caméra, qui descend le couloir en continu |
 
-Le glb est complet : couleur, rugosité et normales sont bakées dedans (WebP intégré), il n'y a
-donc aucune texture à poser à la main. Seule contrainte : la compression meshopt demande un
+Le glb de la banane est complet : couleur, rugosité et normales bakées dedans (WebP intégré).
+Celui de la fraise ne porte que sa rugosité — `fraise_color.png` est posée sur le matériau
+`ChairFraise` au chargement, et le calice (matériau `Calice`, sans couleur exportée par Blender)
+reçoit un vert en dur. Seule contrainte partagée : la compression meshopt de la banane demande un
 décodeur que `useGLTF` de `@tresjs/cientos` ne branche pas — d'où le `GLTFLoader` monté
-directement dans `BananaField`, avec le `MeshoptDecoder` livré par Three.
+directement dans `FruitField`, avec le `MeshoptDecoder` livré par Three.
 
 ### Pourquoi un couloir plutôt qu'une orbite
 
@@ -247,9 +251,10 @@ il partait en surexposition (divisé par ~1,6, exposition à 0,95) — puis **l'
 textures**, que Three laisse à 1 par défaut, ce qui transforme en bouillie toute surface vue de
 biais (`getMaxAnisotropy()` sur chaque texture au chargement).
 
-Les sources Blender (dont le `.blend`, les textures 2048 px et les composants React Three Fiber
-fournis avec le modèle) sont dans `blender/banane/`. Ce dossier est exclu du typecheck : ces
-`.tsx` sont écrits pour React, pas pour TresJS, et ne compileraient pas ici.
+Les sources Blender (dont les `.blend`, les textures haute résolution et les composants React
+Three Fiber fournis avec le modèle de banane) sont dans `blender/banane/` et `blender/fraise/`.
+Ces deux dossiers sont exclus du typecheck : les `.tsx` sont écrits pour React, pas pour TresJS,
+et ne compileraient pas ici.
 
 Pièges rencontrés en construisant ces scènes, à ajouter à la liste de ceux de la
 bouteille :
@@ -257,7 +262,7 @@ bouteille :
 - **Une caméra qui bouge ne redemande pas d'image à elle seule.** Changer `:position` sur
   `TresPerspectiveCamera` ne suffit pas en `render-mode="on-demand"` : sans un
   `renderer.invalidate()` explicite à chaque tick de `progress` (voir le `watch` dans
-  `BananaField`), le canevas affiche une seule image puis reste figé — ou vide, si ce premier
+  `FruitField`), le canevas affiche une seule image puis reste figé — ou vide, si ce premier
   rendu a eu lieu avant la fin du chargement du modèle. Constaté par un canevas obstinément blanc
   malgré une scène par ailleurs correcte (bounding box, matériaux, aucune erreur console).
 - **`look-at` ne recalcule l'orientation que si sa référence change.** Une cible fixe passée comme
@@ -274,6 +279,14 @@ bouteille :
   garantissent pas un segment assez éloigné, la corde coupant par l'intérieur. Dans les deux cas
   le diagnostic est venu de la lecture des valeurs réelles à plusieurs points du scroll, pas de
   l'œil.
+- **Dans un champ de fruits statiques, c'est la caméra qui bouge — donc ce sont les `PLACEMENTS`
+  qu'il faut tenir à distance de son chemin, pas l'inverse.** La dérive sinusoïdale de
+  `BananaStage` fait passer la caméra à des endroits différents selon `progress` ; un fruit posé
+  trop près de ce chemin se fait littéralement traverser, et le plan de coupe rapproché
+  (`:near`) le tranche net. Ça s'est d'abord vu comme une coupure franche à l'écran, pas comme un
+  défaut de mise au point. Diagnostiqué en calculant, pour chaque position, la distance minimale
+  entre le fruit et le chemin de la caméra sur tout `[0, 1]` — un rayon de dégagement par type de
+  fruit (~2,9 pour une banane, ~1,6 pour une fraise) suffit à l'éliminer.
 
 ## Packshots Blender (optionnel)
 

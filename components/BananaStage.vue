@@ -15,7 +15,7 @@
     <TresPerspectiveCamera
       :position="cameraPosition"
       :fov="30"
-      :near="0.3"
+      :near="0.18"
       :far="60"
       :look-at="cameraLookAt"
     />
@@ -26,7 +26,7 @@
 
     <StudioEnvironment />
 
-    <BananaField :progress="progress" />
+    <FruitField :progress="progress" />
 
     <BottlePostFX
       v-if="postfx"
@@ -36,8 +36,8 @@
       :vignette="true"
       :dof="true"
       :dof-focus-distance="FOCUS_AHEAD"
-      :dof-focus-range="1.6"
-      :dof-bokeh-scale="5"
+      :dof-focus-range="3.2"
+      :dof-bokeh-scale="2.6"
     />
   </TresCanvas>
 </template>
