@@ -226,7 +226,7 @@
 // ---------------------------------------------------------------------------
 
 type Kind = 'solaire' | 'comete' | 'prairie' | 'lagon' | 'nuage' | 'aurore'
-type Pose = 'stand' | 'wave' | 'cheer' | 'hold'
+type Pose = 'stand' | 'wave' | 'cheer'
 
 const props = withDefaults(
   defineProps<{
@@ -319,8 +319,6 @@ const arms = computed(() => {
   // Levés à 125–135° plutôt qu'à la verticale : le bras reste hors de la tête.
   if (props.pose === 'cheer') return { l: 135, r: -135 }
   if (props.pose === 'wave') return { l: 6, r: -125 }
-  // Tient une corde : le bras gauche tendu vers elle, l'autre main sur le ventre.
-  if (props.pose === 'hold') return { l: 62, r: 14 }
   return { l: 6, r: -6 }
 })
 </script>
@@ -418,8 +416,6 @@ const arms = computed(() => {
 }
 .arm {
   transform-origin: 0 0;
-  /* Un changement de pose (bras qui se lèvent, se baissent) se fait en douceur. */
-  transition: transform 0.35s ease;
 }
 .arm--l {
   transform: rotate(var(--al));
