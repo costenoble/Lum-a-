@@ -48,6 +48,13 @@ OUT_W = 1320
 OUT_H = round(OUT_W * CROP["h"] / CROP["w"])   # 528 : couleur, puis alpha en dessous
 CRF = 28
 
+# De combien de pixels on épaissit les bordures avant de chercher ce qui touche le bord
+# du cadre. Un œil au bord du visage n'est séparé du fond que par un liséré de
+# quelques pixels, aux points parfois trop pâles pour compter comme une bordure : le
+# fond fuit alors dans l'œil, qui devient transparent. Épaissir bouche ces brèches
+# (jusqu'à environ 2 x SEAL pixels).
+SEAL = 3
+
 # Jusqu'où les couleurs du bord sont prolongées dans la zone transparente, en pixels.
 EXTEND_PX = 8
 
@@ -67,9 +74,13 @@ def matte(rgb: np.ndarray):
 
     # 2. Le fond est ce qui touche le bord du cadre. Le reste est premier plan :
     #    c'est ce qui garde les yeux blancs, enfermés dans le visage, opaques.
-    labels, _ = ndi.label(bglike)  # connexité 4 : un trait fin sépare deux zones
+    #    Les bordures sont d'abord épaissies (SEAL), pour que le fond ne fuie pas dans
+    #    un œil par une brèche de son liséré ; on regagne ensuite ces pixels.
+    barrier = ndi.binary_dilation(~bglike, iterations=SEAL)
+    labels, _ = ndi.label(bglike & ~barrier)  # connexité 4 : un trait fin sépare deux zones
     edge = np.concatenate([labels[0], labels[-1], labels[:, 0], labels[:, -1]])
-    bg = np.isin(labels, np.unique(edge[edge > 0]))
+    core = np.isin(labels, np.unique(edge[edge > 0]))
+    bg = ndi.binary_dilation(core, iterations=SEAL) & bglike
     fg = ~bg
 
     # Les îlots de bruit, loin des personnages, ne sont pas des personnages.
