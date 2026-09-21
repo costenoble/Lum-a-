@@ -17,7 +17,7 @@ npm run generate # version 100 % statique
 
 | Route | Contenu |
 | --- | --- |
-| `/` | Hero vidéo plein écran qui rétrécit en carte au défilement, puis hero titré, manifeste, carrousel des six parfums, 3 nouveautés, savoir-faire, chiffres, teaser studio |
+| `/` | Hero vidéo plein écran qui rétrécit en carte au défilement, puis hero titré, manifeste, bouteille qui tourne au scroll, carrousel des six parfums, 3 nouveautés, savoir-faire, chiffres, teaser studio |
 | `/boissons` | Grille filtrable par gamme |
 | `/fabrication` | Scrollytelling en SVG : on survole l'univers de la Source (couches en parallaxe), six personnages-fruits, quatre étapes de fabrication |
 | `/coffret` | Composeur de coffret six bouteilles, partageable par URL |
@@ -59,13 +59,45 @@ npm run generate # version 100 % statique
   arrive dessous. Même mécanique que la fabrication : une zone haute au contenu collant, un avancement
   0 → 1 fourni par GSAP, tout recalculé depuis lui. Le loader attend, au plus 3,5 s, que la vidéo puisse
   jouer (`heroReady` dans [composables/useIntro.ts](composables/useIntro.ts)) pour ne pas révéler un cadre
-  noir. La vidéo reste à l'arrêt sur sa première image pendant le rideau et **démarre depuis le début
-  quand il se lève** (`curtainUp`, même fichier) ; si le navigateur refuse la lecture automatique, elle
-  repart au premier toucher, clic ou touche. En pause hors écran ; sous `prefers-reduced-motion`, une
+  noir. La vidéo est amorcée dès le montage (muette, sous le rideau) puis remise sur sa première image :
+  les navigateurs ne préchargent pas de façon fiable une vidéo qu'on n'a pas lancée, et sans cela le
+  loader attendrait ses 3,5 s pour rien. Elle **démarre depuis le début quand le rideau se lève**
+  (`curtainUp`, même fichier), et repart si l'onglet était masqué à ce moment-là. Si le navigateur
+  refuse la lecture automatique (réglage du site, économie d'énergie, aperçu intégré à un éditeur),
+  elle ne force rien et repart au premier toucher, clic ou touche : on respecte la politique du
+  navigateur. En pause hors écran ; sous `prefers-reduced-motion`, une
   carte fixe, sans zone collante.
-  La vidéo brute ([components/minimaxH3/hero/](components/minimaxH3/hero/)) est recompressée (4,5 → 2,1 Mo)
+  La vidéo brute ([components/minimaxH3/hero/](components/minimaxH3/hero/), 2262 × 960, la plus récente) est recompressée (6,4 → 2,8 Mo)
   avec son image d'attente par [scripts/hero-video.sh](scripts/hero-video.sh), qui écarte aussi les 4
   premières images (celles du filigrane du fournisseur, voir `START_FRAME` dans le script).
+- **Manifeste sur la bouteille qui tourne** ([components/BottleScroll.vue](components/BottleScroll.vue)) : sur
+  l'accueil, la section « La marque » est épinglée sur une bouteille posée directement sur le fond du
+  site. Le défilement de la zone épinglée fait à la fois tourner la bouteille (la vidéo n'est pas lue mais
+  « scrubée » : du bouchon vu d'en haut au pied du verre, orbite de 10 s générée avec MiniMax H3, parfum
+  Comète) et s'encrer le texte mot à mot ([components/ManifestoText.vue](components/ManifestoText.vue),
+  piloté par sa prop `progress` au lieu de son propre suivi de scroll) ; le lien « Découvrir le studio »
+  n'apparaît qu'à la fin. `BottleScroll` fournit son avancement (0 → 1) à son emplacement (`v-slot`), et
+  reste utilisable sans texte. Sur grand écran, le texte est à gauche et la vidéo est décalée de 20 vw vers
+  la droite : un gros plan de la bouteille est un mur rouge sombre, il ne doit jamais passer derrière le
+  texte noir. Sur téléphone, le texte se pose en bas sur un voile de la couleur du fond, et la vidéo remonte
+  (`-17svh`).
+  Reprend trois astuces du moteur scroll-world sans l'embarquer (il construit sa propre page et sa propre
+  nav) : image clé toutes les 4 images, donc afficher n'importe quel instant, dans les deux sens, ne décode
+  jamais plus de 3 images ; chargement en mémoire (Blob) avant usage ; un saut n'est jamais redemandé tant
+  que le précédent n'est pas terminé. Rien ne charge avant que la section approche ; sous
+  `prefers-reduced-motion`, une image fixe. Sur téléphone la vidéo remplit l'écran (`cover`) : bouteille
+  entière grande et nette, gros plans qui débordent sur les côtés.
+  **Le fond est celui du site, cuit dans la vidéo** par [scripts/bottle-video.py](scripts/bottle-video.py) :
+  chaque image est détourée (bouteille, bouchon, étiquette, ombre au sol, verre clair) puis recomposée sur
+  `--paper` (`#f3f2ef`). C'est une vidéo ordinaire, sans canal alpha ni shader, qui se fond dans la page ;
+  le verre clair est rendu pour un fond CLAIR (sur un fond sombre il faudrait un autre traitement). Le
+  script agrandit (x1,25) et affûte légèrement (la source est en 768p), rogne le début (`START_FRAME` : un
+  zoom éclair depuis la photo de départ, qui porte aussi le filigrane du fournisseur) et compense l'écart de
+  couleur du décodage vidéo (`DISPLAY_OFFSET`, mesuré dans Chrome : sans cela, la vidéo apparaîtrait de 2 à
+  3 niveaux plus claire que la page). Ajouter un parfum : lancer le script sur sa vidéo, puis faire de
+  `BottleScroll` un composant à propriété. Les fichiers de travail
+  `components/minimaxH3/bottle/lumea-scroll/work/args_*.json` contiennent des liens signés : ne pas les
+  versionner.
 - **Course au bord du pied de page** ([components/FooterSprint.vue](components/FooterSprint.vue)) :
   trois fruits (fraise, banane, pastèque) traversent l'arête du pied de page de temps en temps, à
   trois fois la taille d'origine. Vidéo générée avec MiniMax H3 ([components/minimaxH3/](components/minimaxH3/),
@@ -74,25 +106,20 @@ npm run generate # version 100 % statique
   **Le fond est retiré par un vrai canal alpha**, pas par un mode de fusion CSS (qui n'est pas
   respecté partout sur une vidéo) : [scripts/sprint-alpha.py](scripts/sprint-alpha.py) détoure chaque
   image hors ligne (fond = ce qui touche le bord du cadre, donc les yeux blancs restent opaques ;
-  ombres du sol conservées, translucides) et écrit `fruit-sprint-footer.alpha.mp4` : un `.mp4`
+  les bordures sont épaissies de quelques pixels pour que le fond ne fuie pas dans un œil par une brèche
+  de son liséré ; ombres du sol conservées, translucides) et écrit `fruit-sprint-footer.alpha.mp4` : un `.mp4`
   ordinaire, couleur en moitié haute et masque en moitié basse, que le shader WebGL du composant
   recompose dans un canvas transparent. Pour régénérer : `pip install numpy scipy` puis
   `python3 scripts/sprint-alpha.py` (ffmpeg requis, environ 1 min 30). Si la vidéo change, ajuster
   `CROP` et `FLOOR_Y` dans le script, et `SIZE` dans le composant. Rien n'est téléchargé avant que le
   pied de page approche, lecture en pause hors écran, composant absent sous `prefers-reduced-motion`
   ou sans WebGL. Taille à l'écran : une seule variable CSS, `--h`.
-- **Sauvetage à l'ouverture du menu** ([components/NavRescue.vue](components/NavRescue.vue)) : un
-  personnage tombe du haut de l'écran, la corde que tient son compagnon (debout sur un rocher
-  flottant) se tend, il rebondit et se balance en s'amortissant, puis les deux se réjouissent.
-  La scène vit derrière les liens du menu ; le duo change à chaque ouverture. Le balancier est un
-  pendule amorti calculé (pas une image clé) : la corde et les positions suivent n'importe quel
-  écran. Sous `prefers-reduced-motion`, on affiche directement la dernière image.
 - **Personnages-fruits** ([components/FruitBuddy.vue](components/FruitBuddy.vue)) : un fruit-tête
   habillé en enfant (salopette, t-shirt rayé, baskets) par parfum, avec l'emblème de la boisson sur
   la poche — mangue/soleil, fraise/étoile, pomme/feuille, poire/vague, myrtille/nuage,
   pêche/lever de soleil. SVG pur, animés en CSS (souffle, clignement, bras qui saluent), figés en
-  `prefers-reduced-motion`. On les retrouve dans l'univers, dans la carte de légende et dans le
-  sauvetage du menu.
+  `prefers-reduced-motion`. On les retrouve dans l'univers, dans la carte de légende de la page
+  fabrication.
 - **Composeur de coffret** ([pages/coffret.vue](pages/coffret.vue)) : six casiers, la bouteille
   tombe dans son emplacement, le halo de la caisse mélange les couleurs choisies, le prix roule.
   La composition est encodée dans l'URL (`?c=solaire-comete-…`), donc un coffret se partage par

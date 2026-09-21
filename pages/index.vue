@@ -37,16 +37,25 @@
       :items="['Sans sucres ajoutés', 'Verre consigné', 'Fruits français', 'Dès 2 ans']"
     />
 
-    <!-- MANIFESTE -->
-    <section class="section container manifesto-wrap">
-      <p class="eyebrow" v-reveal>La marque</p>
-      <ManifestoText
-        text="Luméa fabrique des boissons que les enfants réclament et que les parents acceptent. Pas de sucre ajouté, pas de colorant, pas de personnage sous licence. Juste du fruit, du verre, et une lumière qu’on a mis deux ans à trouver."
-      />
-      <NuxtLink to="/studio" class="btn btn--ghost" v-magnetic v-reveal="0.1">
-        <span>Découvrir le studio</span>
-      </NuxtLink>
-    </section>
+    <!-- MANIFESTE, épinglé sur la bouteille qui tourne : le texte s'encre mot à mot au rythme
+         de la rotation (la vidéo suit le scroll), et le lien apparaît à la fin. -->
+    <BottleScroll v-slot="{ progress }">
+      <div class="container manifesto-wrap">
+        <p class="eyebrow" v-reveal>La marque</p>
+        <ManifestoText
+          :progress="inkProgress(progress)"
+          text="Luméa fabrique des boissons que les enfants réclament et que les parents acceptent. Pas de sucre ajouté, pas de colorant, pas de personnage sous licence. Juste du fruit, du verre, et une lumière qu’on a mis deux ans à trouver."
+        />
+        <NuxtLink
+          to="/studio"
+          class="btn btn--ghost manifesto-cta"
+          :class="{ 'is-on': progress > 0.86 }"
+          v-magnetic
+        >
+          <span>Découvrir le studio</span>
+        </NuxtLink>
+      </div>
+    </BottleScroll>
 
     <!-- LES SIX PARFUMS — carrousel accordéon -->
     <section class="section container">
@@ -145,6 +154,10 @@ useHead({ title: 'Luméa — Boissons lumineuses pour les petits' })
 
 const featured = computed(() => drinks.slice(0, 3))
 
+// Le texte s'encre entre 6 % et 82 % de la rotation : il est lisible en entier avant la fin,
+// et la bouteille finit seule, sur son dernier plan.
+const inkProgress = (p: number) => Math.min(1, Math.max(0, (p - 0.06) / 0.76))
+
 // Parfum mis en scène en 3D dans le hero.
 const hero = drinks[0]!
 
@@ -229,6 +242,16 @@ const carouselItems = computed(() =>
   display: grid;
   gap: var(--sp-4);
   justify-items: start;
+}
+/* Le lien n'apparaît qu'une fois le texte lu, et ne gêne pas avant. */
+.manifesto-cta {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s var(--ease-soft);
+}
+.manifesto-cta.is-on {
+  opacity: 1;
+  pointer-events: auto;
 }
 .eyebrow-link {
   font-family: var(--font-mono);

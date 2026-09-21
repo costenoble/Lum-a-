@@ -8,3 +8,19 @@ dist
 # Reference stock asset (Freepik/macrovector) kept locally for Blender
 # modeling only - its own README says it must not be published.
 blender/reference/
+
+# Fichiers de travail MiniMax : ils contiennent des liens de stockage signés (identifiant
+# et signature d'accès) et des chemins de la machine. Ne jamais les versionner.
+components/minimaxH3/**/work/
+components/minimaxH3/*-prompt.json
+components/minimaxH3/*-task-record.json
+
+# Le dossier de démo scroll-world et ses médias non utilisés par le site (seules la vidéo
+# source de la bouteille Comète et les vidéos web sont suivies).
+components/minimaxH3/bottle/lumea-scroll/site/
+components/minimaxH3/bottle/lumea-scroll/prepared-media/
+components/minimaxH3/bottle/lumea-scroll/videos/*
+!components/minimaxH3/bottle/lumea-scroll/videos/lumea_strawberry_v2.mp4
+
+.DS_Store
+__pycache__/
