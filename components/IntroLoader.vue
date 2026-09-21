@@ -65,7 +65,7 @@ onMounted(() => {
     if (!tl.isActive()) return
     tl.kill()
     finish()
-  }, 5000)
+  }, 5000 + HERO_WAIT_MS)
   tl.eventCallback('onComplete', () => {
     window.clearTimeout(failsafe)
     finish()
@@ -92,6 +92,15 @@ onMounted(() => {
       },
       0
     )
+    // Le compteur est à 100. Si la vidéo du hero n'est pas encore prête, on attend
+    // (au plus HERO_WAIT_MS) avant de lever le rideau : on ne veut pas découvrir un
+    // cadre noir. La pause vit dans un callback, hors du calcul des durées ci-dessus.
+    .call(() => {
+      tl.pause()
+      Promise.race([heroReady, new Promise<void>((r) => window.setTimeout(r, HERO_WAIT_MS))]).then(() =>
+        tl.play()
+      )
+    })
     // Sortie : le mot repart vers le haut, puis les bandes le suivent.
     .to([wordEl.value, baselineEl.value], {
       yPercent: -120,
@@ -100,6 +109,8 @@ onMounted(() => {
       stagger: 0.05
     })
     .to(countEl.value, { autoAlpha: 0, duration: 0.3 }, '-=0.5')
+    // Les bandes vont se lever : la vidéo du hero démarre à cet instant précis.
+    .call(markCurtainUp, undefined, '-=0.25')
     .to(
       el.querySelectorAll('.intro__bands span'),
       {

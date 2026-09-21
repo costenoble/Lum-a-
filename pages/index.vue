@@ -1,7 +1,10 @@
 <template>
   <div>
+    <!-- HERO VIDÉO : plein écran au chargement, puis rétrécit en carte au défilement -->
+    <HeroVideo />
+
     <!-- HERO -->
-    <section class="hero container">
+    <section class="hero hero--after-video container">
       <p class="eyebrow" v-reveal>Marque de boissons · {{ site.city }} · Depuis {{ site.since }}</p>
 
       <h1 class="hero__title" v-lines="0.1" style="margin-top: 2rem">
@@ -180,6 +183,11 @@ const carouselItems = computed(() =>
    superposition : le texte reste toujours lisible par-dessus. */
 .hero {
   position: relative;
+}
+/* Le hero suit la carte vidéo : plus besoin de le faire remplir un écran entier. */
+.hero--after-video {
+  min-height: auto;
+  padding-top: 2rem;
 }
 .hero__bottle {
   position: absolute;

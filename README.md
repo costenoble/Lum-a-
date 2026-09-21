@@ -17,7 +17,7 @@ npm run generate # version 100 % statique
 
 | Route | Contenu |
 | --- | --- |
-| `/` | Hero, manifeste, carrousel des six parfums, 3 nouveautés, savoir-faire, chiffres, teaser studio |
+| `/` | Hero vidéo plein écran qui rétrécit en carte au défilement, puis hero titré, manifeste, carrousel des six parfums, 3 nouveautés, savoir-faire, chiffres, teaser studio |
 | `/boissons` | Grille filtrable par gamme |
 | `/fabrication` | Scrollytelling en SVG : on survole l'univers de la Source (couches en parallaxe), six personnages-fruits, quatre étapes de fabrication |
 | `/coffret` | Composeur de coffret six bouteilles, partageable par URL |
@@ -52,6 +52,20 @@ npm run generate # version 100 % statique
   îles flottantes, château, lac, cristal, cerisiers, prairie — dont chaque couche grossit à sa
   vitesse depuis l'horizon : le parallaxe donne la profondeur, sans 3D ni vidéo. Direction
   artistique tirée de l'illustration envoyée par le client, à remplacer par l'illustration finale.
+- **Hero vidéo** ([components/HeroVideo.vue](components/HeroVideo.vue)) : au chargement, le rideau se
+  lève sur une vidéo MiniMax H3 en plein écran, titre superposé. En défilant, le cadre rétrécit en une
+  carte arrondie calée sur la colonne du site (un gabarit invisible mesure sa place exacte, donc elle
+  s'aligne à toutes les largeurs ; carte 4:5 sur téléphone), puis la zone se libère et le hero d'origine
+  arrive dessous. Même mécanique que la fabrication : une zone haute au contenu collant, un avancement
+  0 → 1 fourni par GSAP, tout recalculé depuis lui. Le loader attend, au plus 3,5 s, que la vidéo puisse
+  jouer (`heroReady` dans [composables/useIntro.ts](composables/useIntro.ts)) pour ne pas révéler un cadre
+  noir. La vidéo reste à l'arrêt sur sa première image pendant le rideau et **démarre depuis le début
+  quand il se lève** (`curtainUp`, même fichier) ; si le navigateur refuse la lecture automatique, elle
+  repart au premier toucher, clic ou touche. En pause hors écran ; sous `prefers-reduced-motion`, une
+  carte fixe, sans zone collante.
+  La vidéo brute ([components/minimaxH3/hero/](components/minimaxH3/hero/)) est recompressée (4,5 → 2,1 Mo)
+  avec son image d'attente par [scripts/hero-video.sh](scripts/hero-video.sh), qui écarte aussi les 4
+  premières images (celles du filigrane du fournisseur, voir `START_FRAME` dans le script).
 - **Course au bord du pied de page** ([components/FooterSprint.vue](components/FooterSprint.vue)) :
   trois fruits (fraise, banane, pastèque) traversent l'arête du pied de page de temps en temps, à
   trois fois la taille d'origine. Vidéo générée avec MiniMax H3 ([components/minimaxH3/](components/minimaxH3/),
