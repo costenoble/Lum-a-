@@ -1,7 +1,7 @@
 <template>
   <div class="fab" ref="wrap" :style="{ '--fab-scroll': `${scrollVh}vh` }">
     <div class="fab__sticky">
-      <BananaStage class="fab__stage" :progress="progress" />
+      <UniverseScene class="fab__stage" :progress="progress" />
       <slot :progress="progress" />
     </div>
   </div>
@@ -11,20 +11,22 @@
 import gsap from 'gsap'
 
 // ---------------------------------------------------------------------------
-// Vol de caméra autour de la banane, en 3D temps réel, piloté par le scroll.
+// Vol au-dessus de l'univers de la Source, en SVG, piloté par le scroll.
 //
 // Le composant ne connaît que deux choses : la hauteur de défilement du bloc,
-// et la valeur d'avancement qu'il en tire. Tout le reste — la trajectoire en
-// spline, le champ de vision, la cible — est déclaré dans BananaStage, qui
-// dérive tout de `progress`. Le fruit lui-même ne bouge jamais.
+// et la valeur d'avancement qu'il en tire. Tout le reste — les couches du
+// décor, les personnages, le cristal — est déclaré dans UniverseScene, qui
+// dérive tout de `progress`.
 // ---------------------------------------------------------------------------
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     /** Hauteur de défilement du bloc, en vh. Plus haut = plus lent. */
     scrollVh?: number
+    /** Avancement affiché sans animation (prefers-reduced-motion). */
+    restProgress?: number
   }>(),
-  { scrollVh: 420 }
+  { scrollVh: 420, restProgress: 1 }
 )
 
 const emit = defineEmits<{ progress: [number] }>()
@@ -39,9 +41,9 @@ onMounted(() => {
   if (!host) return
 
   if ($reduceMotion) {
-    // Pas de scrub : le cadrage final, tout de suite.
-    progress.value = 1
-    emit('progress', 1)
+    // Pas de scrub : un cadrage fixe, tout de suite.
+    progress.value = props.restProgress
+    emit('progress', props.restProgress)
     return
   }
 
@@ -74,7 +76,7 @@ onMounted(() => {
   height: 100svh;
   overflow: hidden;
 }
-/* Le canvas suit son conteneur : c'est ce bloc collant qui donne la taille,
+/* Le dessin suit son conteneur : c'est ce bloc collant qui donne la taille,
    jamais le bloc de défilement, qui fait plusieurs écrans de haut. */
 .fab__stage {
   width: 100%;
