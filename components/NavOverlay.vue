@@ -1,5 +1,8 @@
 <template>
   <div id="nav-overlay" class="nav-overlay" ref="root" :aria-hidden="!navOpen">
+    <!-- Derrière les liens : le sauvetage ne masque jamais un lien. -->
+    <NavRescue ref="rescue" />
+
     <nav>
       <ul class="nav-overlay__list">
         <li v-for="item in nav" :key="item.to">
@@ -57,14 +60,27 @@ import gsap from 'gsap'
 
 const navOpen = useNavOpen()
 const root = ref<HTMLElement | null>(null)
+const rescue = ref<{
+  play: () => void
+  stop: () => void
+  reset: () => void
+  showRest: () => void
+} | null>(null)
 const { $reduceMotion, $lenis } = useNuxtApp()
 
 // Le panneau se dévoile par clip-path (rideau du haut), les entrées montent
 // derrière leur masque. On garde une seule timeline, reconstruite à chaque
 // bascule : plus lisible qu'un reverse() à maintenir.
+// Elle est arrêtée avant d'être remplacée : sinon la fin d'une fermeture encore
+// en cours (`visibility: hidden`) tomberait après une réouverture rapide et
+// referait disparaître un menu pourtant ouvert.
+let tl: gsap.core.Timeline | null = null
+
 watch(navOpen, (open) => {
   const el = root.value
   if (!el) return
+
+  tl?.kill()
 
   const items = el.querySelectorAll('.nav-overlay__list a')
   const meta = el.querySelector('.nav-overlay__meta')
@@ -77,10 +93,12 @@ watch(navOpen, (open) => {
   if ($reduceMotion) {
     gsap.set(el, { autoAlpha: open ? 1 : 0, clipPath: 'inset(0 0 0 0)' })
     gsap.set([items, meta], { yPercent: 0, autoAlpha: 1 })
+    // Pas de chute : les deux personnages, déjà là, la corde tendue.
+    open ? rescue.value?.showRest() : rescue.value?.reset()
     return
   }
 
-  const tl = gsap.timeline()
+  tl = gsap.timeline()
   if (open) {
     tl.set(el, { visibility: 'visible' })
       .fromTo(
@@ -95,11 +113,16 @@ watch(navOpen, (open) => {
         '-=0.35'
       )
       .fromTo(meta, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.5 }, '-=0.4')
+      // Le rideau est presque ouvert : c'est le moment de la chute.
+      .call(() => rescue.value?.play(), undefined, 0.45)
   } else {
+    // La scène s'arrête net ; le rideau qui remonte l'emporte avec lui.
+    rescue.value?.stop()
     tl.to(items, { yPercent: -115, duration: 0.4, ease: 'power3.in', stagger: 0.04 })
       .to(meta, { autoAlpha: 0, duration: 0.2 }, 0)
       .to(el, { clipPath: 'inset(0 0 100% 0)', duration: 0.6, ease: 'expo.inOut' }, '-=0.15')
       .set(el, { visibility: 'hidden' })
+      .call(() => rescue.value?.reset())
   }
 })
 
@@ -112,3 +135,13 @@ onMounted(() => {
   onUnmounted(() => window.removeEventListener('keydown', onKey))
 })
 </script>
+
+<style scoped>
+/* La scène est en absolu, au fond : le contenu du menu passe devant. */
+.nav-overlay > nav,
+.nav-overlay__secondary,
+.nav-overlay__meta {
+  position: relative;
+  z-index: 1;
+}
+</style>
