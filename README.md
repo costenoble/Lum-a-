@@ -19,7 +19,7 @@ npm run generate # version 100 % statique
 | --- | --- |
 | `/` | Hero, manifeste, carrousel des six parfums, 3 nouveautés, savoir-faire, chiffres, teaser studio |
 | `/boissons` | Grille filtrable par gamme |
-| `/fabrication` | Scrollytelling 3D : la caméra traverse en continu un couloir de bananes (glb importé), au rythme du scroll |
+| `/fabrication` | Scrollytelling en SVG : on survole l'univers de la Source (couches en parallaxe), six personnages-fruits, quatre étapes de fabrication |
 | `/coffret` | Composeur de coffret six bouteilles, partageable par URL |
 | `/boutique` | Packs, prix, ajout au panier (tiroir latéral) |
 | `/panier` | Page panier : lignes animées, récap, jauge de franco, confirmation |
@@ -46,11 +46,39 @@ npm run generate # version 100 % statique
 - **Curseur maison** ([components/CustomCursor.vue](components/CustomCursor.vue)) : point qui suit
   la souris et devient une pastille libellée au survol de tout élément portant
   `data-cursor="Voir"`. Inactif au tactile et en `prefers-reduced-motion`.
-- **Fabrication en 3D au scroll** ([components/FabricationScene.vue](components/FabricationScene.vue)) :
-  un bloc haut, un visuel collant, et la position de scroll qui pilote la scène Three.js. La
-  scène elle-même (un couloir de bananes et de fraises importées de Blender, caméra en
-  traversée continue) vit dans [components/BananaStage.vue](components/BananaStage.vue) — voir
-  « Le couloir de fruits » plus bas.
+- **Univers de la Source au scroll** ([components/FabricationScene.vue](components/FabricationScene.vue)) :
+  un bloc haut, un visuel collant, et la position de scroll qui donne un `progress` (0 → 1). Le
+  décor ([components/UniverseScene.vue](components/UniverseScene.vue)) est un SVG en couches — ciel,
+  îles flottantes, château, lac, cristal, cerisiers, prairie — dont chaque couche grossit à sa
+  vitesse depuis l'horizon : le parallaxe donne la profondeur, sans 3D ni vidéo. Direction
+  artistique tirée de l'illustration envoyée par le client, à remplacer par l'illustration finale.
+- **Course au bord du pied de page** ([components/FooterSprint.vue](components/FooterSprint.vue)) :
+  trois fruits (fraise, banane, pastèque) traversent l'arête du pied de page de temps en temps, à
+  trois fois la taille d'origine. Vidéo générée avec MiniMax H3 ([components/minimaxH3/](components/minimaxH3/),
+  prompt et fiche de tâche à côté). Elle est filmée sur fond de studio blanc, caméra qui suit les
+  personnages : ils courent sur place, et c'est GSAP qui fait glisser la vidéo d'un bord à l'autre.
+  **Le fond est retiré par un vrai canal alpha**, pas par un mode de fusion CSS (qui n'est pas
+  respecté partout sur une vidéo) : [scripts/sprint-alpha.py](scripts/sprint-alpha.py) détoure chaque
+  image hors ligne (fond = ce qui touche le bord du cadre, donc les yeux blancs restent opaques ;
+  ombres du sol conservées, translucides) et écrit `fruit-sprint-footer.alpha.mp4` : un `.mp4`
+  ordinaire, couleur en moitié haute et masque en moitié basse, que le shader WebGL du composant
+  recompose dans un canvas transparent. Pour régénérer : `pip install numpy scipy` puis
+  `python3 scripts/sprint-alpha.py` (ffmpeg requis, environ 1 min 30). Si la vidéo change, ajuster
+  `CROP` et `FLOOR_Y` dans le script, et `SIZE` dans le composant. Rien n'est téléchargé avant que le
+  pied de page approche, lecture en pause hors écran, composant absent sous `prefers-reduced-motion`
+  ou sans WebGL. Taille à l'écran : une seule variable CSS, `--h`.
+- **Sauvetage à l'ouverture du menu** ([components/NavRescue.vue](components/NavRescue.vue)) : un
+  personnage tombe du haut de l'écran, la corde que tient son compagnon (debout sur un rocher
+  flottant) se tend, il rebondit et se balance en s'amortissant, puis les deux se réjouissent.
+  La scène vit derrière les liens du menu ; le duo change à chaque ouverture. Le balancier est un
+  pendule amorti calculé (pas une image clé) : la corde et les positions suivent n'importe quel
+  écran. Sous `prefers-reduced-motion`, on affiche directement la dernière image.
+- **Personnages-fruits** ([components/FruitBuddy.vue](components/FruitBuddy.vue)) : un fruit-tête
+  habillé en enfant (salopette, t-shirt rayé, baskets) par parfum, avec l'emblème de la boisson sur
+  la poche — mangue/soleil, fraise/étoile, pomme/feuille, poire/vague, myrtille/nuage,
+  pêche/lever de soleil. SVG pur, animés en CSS (souffle, clignement, bras qui saluent), figés en
+  `prefers-reduced-motion`. On les retrouve dans l'univers, dans la carte de légende et dans le
+  sauvetage du menu.
 - **Composeur de coffret** ([pages/coffret.vue](pages/coffret.vue)) : six casiers, la bouteille
   tombe dans son emplacement, le halo de la caisse mélange les couleurs choisies, le prix roule.
   La composition est encodée dans l'URL (`?c=solaire-comete-…`), donc un coffret se partage par
@@ -179,6 +207,9 @@ Quand les vrais modèles Blender arriveront, `useGLTF` de `@tresjs/cientos` remp
 sans toucher au reste.
 
 ## Le couloir de fruits (glb importés)
+
+> Version précédente de `/fabrication`. La page ne l'utilise plus ; `BananaStage`, `FruitField` et
+> les modèles restent dans le dépôt en attendant d'être nettoyés.
 
 Contrairement à la bouteille, entièrement procédurale, les fruits de `/fabrication` sont de vrais
 modèles Blender : la banane (1,7 Mo, textures 2048 px complètes) et la fraise (glb + une seule

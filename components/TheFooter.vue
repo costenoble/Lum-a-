@@ -1,5 +1,8 @@
 <template>
   <footer class="night footer">
+    <!-- Trois fruits qui traversent le bord du pied de page de temps en temps. -->
+    <FooterSprint />
+
     <div class="container">
       <p class="eyebrow">Parlons-en</p>
 
@@ -71,3 +74,10 @@ onMounted(() => {
   onUnmounted(() => window.clearInterval(id))
 })
 </script>
+
+<style scoped>
+/* Repère de position pour FooterSprint, posé sur l'arête haute du pied de page. */
+.footer {
+  position: relative;
+}
+</style>
