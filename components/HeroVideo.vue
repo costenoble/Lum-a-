@@ -57,7 +57,7 @@ const SRC = heroSrc
 const POSTER = heroPoster
 
 /** Format de la vidéo, pour la carte d'arrivée sur grand écran. */
-const RATIO = 1696 / 720
+const RATIO = 2262 / 960
 /** Sur téléphone la carte est plus haute que large : un plan de cinéma y serait minuscule. */
 const NARROW = 700
 const NARROW_RATIO = 4 / 5
@@ -150,17 +150,34 @@ onMounted(() => {
     return
   }
 
-  // La vidéo attend, à l'arrêt sur sa première image, que le rideau se lève : elle
-  // démarre alors depuis le début, et on voit tout le plan. Sans rideau (page
-  // interne), le signal est déjà donné.
+  // Départ : la vidéo attend, à l'arrêt sur sa première image, que le rideau se
+  // lève ; elle démarre alors depuis le début, et on voit tout le plan. Sans rideau
+  // (page interne), le signal est déjà donné.
   let started = false
   const start = () => {
     v.play().then(disarm).catch(arm)
   }
+
+  // Amorçage. Les navigateurs ne chargent pas de façon fiable une vidéo qu'on n'a
+  // pas encore lancée (preload="auto" est un souhait, pas un ordre : dans Chrome,
+  // rien n'arrive avant play(), et Safari ne charge que les métadonnées). Sans
+  // cela, le loader attendrait ses 3,5 s pour rien, puis la lecture partirait sur
+  // une vidéo vide. On la lance donc tout de suite, muette, sous le rideau, et on la
+  // remet sur sa première image dès qu'elle joue ; le vrai départ vient après.
+  // Si la lecture est refusée, inutile de faire attendre le loader.
+  v.muted = true
+  v.play()
+    .then(() => {
+      if (started) return
+      v.pause()
+      v.currentTime = 0
+    })
+    .catch(ready)
+
   // Certains navigateurs refusent la lecture automatique même muette (économie
-  // d'énergie, réglages du site) : au premier geste de l'utilisateur, on relance.
-  // Un simple défilement à la molette n'est pas un geste pour eux ; un toucher, un
-  // clic ou une touche, si.
+  // d'énergie, réglages du site, aperçu intégré à un éditeur) : au premier geste de
+  // l'utilisateur, on relance. Un simple défilement à la molette n'est pas un geste
+  // pour eux ; un toucher, un clic ou une touche, si.
   const GESTURES = ['pointerdown', 'touchend', 'keydown', 'click'] as const
   const kick = () => {
     if (started) start()
@@ -174,10 +191,18 @@ onMounted(() => {
     start()
   })
 
+  // Un onglet masqué au moment du départ ne joue pas : on relance à son retour.
+  const onVisible = () => {
+    if (started && !document.hidden && v.paused && inView) start()
+  }
+  document.addEventListener('visibilitychange', onVisible)
+
   // Hors de vue, la vidéo ne tourne pas pour rien (et pas avant le départ).
+  let inView = true
   observer = new IntersectionObserver(([entry]) => {
+    inView = entry?.isIntersecting ?? false
     if (!started) return
-    if (entry?.isIntersecting) start()
+    if (inView) start()
     else v.pause()
   })
   observer.observe(root.value)
@@ -206,6 +231,7 @@ onMounted(() => {
   cleanup = () => {
     v.removeEventListener('canplay', ready)
     v.removeEventListener('error', ready)
+    document.removeEventListener('visibilitychange', onVisible)
     disarm()
   }
 })
@@ -323,7 +349,7 @@ onUnmounted(() => {
   top: auto;
   width: 100%;
   height: auto;
-  aspect-ratio: 1696 / 720;
+  aspect-ratio: 2262 / 960;
   border-radius: 28px;
 }
 .hv--static .hv__overlay {
