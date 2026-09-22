@@ -175,7 +175,7 @@ onMounted(() => {
   position: absolute;
   top: calc(var(--header-h) + 1.4rem);
   right: var(--pad-inline);
-  width: clamp(296px, 34vw, 440px);
+  width: clamp(592px, 68vw, 880px);
   aspect-ratio: 1934 / 1080;
   object-fit: cover;
   pointer-events: none;
@@ -184,7 +184,7 @@ onMounted(() => {
   /* Sous ce panneau, la liste de liens en gros caractères peut passer sous la
      vignette : on la réduit encore pour ne rester que dans la marge du haut. */
   .nav-overlay__video {
-    width: clamp(192px, 60vw, 260px);
+    width: clamp(280px, 74vw, 380px);
   }
 }
 </style>
