@@ -46,26 +46,6 @@ npm run generate # version 100 % statique
 - **Curseur maison** ([components/CustomCursor.vue](components/CustomCursor.vue)) : point qui suit
   la souris et devient une pastille libellée au survol de tout élément portant
   `data-cursor="Voir"`. Inactif au tactile et en `prefers-reduced-motion`.
-- **Vidéo du menu** ([components/NavOverlay.vue](components/NavOverlay.vue)) : à l'ouverture, une petite
-  vignette apparaît en haut à droite du panneau (sous « Panier »/« Fermer », à côté de la liste de
-  liens) — un personnage qui écrit « MENU » à la craie sur un tableau noir, généré avec MiniMax H3
-  ([components/minimaxH3/menu/](components/minimaxH3/menu/)). La vignette reprend presque exactement
-  le ratio de la vidéo source (1934 × 1080) : `object-fit: cover` n'a alors quasiment rien à rogner,
-  le mot reste entier à toutes les tailles d'écran — une première version en plein fond du panneau
-  s'est révélée illisible sur téléphone (l'essentiel du cadre coupé sur les côtés). La vidéo est
-  chargée en mémoire (Blob) dès le montage du panneau, pas seulement à l'ouverture : au premier
-  clic, `preload` seul ne garantit rien (voir HeroVideo plus bas), et un fichier de 1,1 Mo tient
-  largement en mémoire pour toute la session. Elle repart du début à chaque ouverture et se met en
-  pause à la fermeture ; sous `prefers-reduced-motion`, jamais chargée, l'image d'attente (le mot
-  déjà écrit) suffit. La balise `<video>` reste toujours dans le DOM, y compris pour ces visiteurs :
-  la conditionner avec `v-if="!$reduceMotion"` provoquerait un écart entre le rendu serveur (qui ne
-  connaît jamais cette préférence) et le client, un vrai bug rencontré en cours de route.
-  Contrairement aux autres vidéos MiniMax du site, le filigrane du fournisseur n'est pas limité aux
-  premières images : il est présent sur les 141 images, dans le même coin bas-droit, sur un fond
-  resté uniformément noir pur à cet endroit sur toute la vidéo (vérifié image par image : le
-  personnage n'y entre jamais, ses pieds restent sur la partie gauche du cadre). Un rectangle noir
-  est donc peint dessus (`drawbox`, [scripts/menu-video.sh](scripts/menu-video.sh)) plutôt que rogné
-  comme pour le hero ou la bouteille — un rognage aurait coupé les pieds du personnage.
 - **Univers de la Source au scroll** ([components/FabricationScene.vue](components/FabricationScene.vue)) :
   un bloc haut, un visuel collant, et la position de scroll qui donne un `progress` (0 → 1). Le
   décor ([components/UniverseScene.vue](components/UniverseScene.vue)) est un SVG en couches — ciel,
@@ -87,9 +67,11 @@ npm run generate # version 100 % statique
   elle ne force rien et repart au premier toucher, clic ou touche : on respecte la politique du
   navigateur. En pause hors écran ; sous `prefers-reduced-motion`, une
   carte fixe, sans zone collante.
-  La vidéo brute ([components/minimaxH3/hero/](components/minimaxH3/hero/), 2262 × 960, la plus récente) est recompressée (6,4 → 2,8 Mo)
-  avec son image d'attente par [scripts/hero-video.sh](scripts/hero-video.sh), qui écarte aussi les 4
-  premières images (celles du filigrane du fournisseur, voir `START_FRAME` dans le script).
+  La vidéo brute ([components/minimaxH3/hero/](components/minimaxH3/hero/), 2262 × 960, la plus récente) est recompressée
+  avec son image d'attente par [scripts/hero-video.sh](scripts/hero-video.sh), qui écarte aussi les
+  premières images touchées par le filigrane du fournisseur (`START_FRAME` dans le script — son
+  compte dépend de la vidéo brute, à revérifier à chaque nouvelle génération plutôt qu'à supposer
+  inchangé).
 - **Manifeste sur la bouteille qui tourne** ([components/BottleScroll.vue](components/BottleScroll.vue)) : sur
   l'accueil, la section « La marque » est épinglée sur une bouteille posée directement sur le fond du
   site. Le défilement de la zone épinglée fait à la fois tourner la bouteille (la vidéo n'est pas lue mais
@@ -118,31 +100,63 @@ npm run generate # version 100 % statique
   `BottleScroll` un composant à propriété. Les fichiers de travail
   `components/minimaxH3/bottle/lumea-scroll/work/args_*.json` contiennent des liens signés : ne pas les
   versionner.
-- **Course au bord du pied de page** ([components/FooterSprint.vue](components/FooterSprint.vue)) :
-  trois fruits (fraise, banane, pastèque) traversent le bas de la page de temps en temps, à trois fois
-  la taille d'origine. **Ils courent dans une bande réservée** au-dessus du pied de page, sous le dernier
-  contenu : le pied de page réserve exactement la place qui manque (`--sprint-h`, la hauteur de la piste,
-  moins le vide qu'une page a déjà en bas), et `main` a un `z-index` au-dessus d'eux. Résultat : derrière
-  un fruit, il n'y a jamais que le fond du site, donc un défaut de détourage se fond dedans : le blanc
-  manquant du petit œil de profil de la banane (identique au fond de studio dans la vidéo, donc
-  irrécupérable) prend la couleur de la page au lieu de laisser voir une lettre ou une photo. Ils ne courent pas sur `/contact` (liste `NO_SPRINT` dans
-  [components/TheFooter.vue](components/TheFooter.vue) ; le composant est démonté, la vidéo n'y est jamais
-  téléchargée). Une page dont la fin a moins de vide que le standard doit lui redonner
-  `padding-bottom: var(--sp-6)` (comme `.next-case`), sinon le contenu passe devant le haut des fruits.
-  Vidéo générée avec MiniMax H3 ([components/minimaxH3/](components/minimaxH3/),
-  prompt et fiche de tâche à côté). Elle est filmée sur fond de studio blanc, caméra qui suit les
-  personnages : ils courent sur place, et c'est GSAP qui fait glisser la vidéo d'un bord à l'autre.
-  **Le fond est retiré par un vrai canal alpha**, pas par un mode de fusion CSS (qui n'est pas
-  respecté partout sur une vidéo) : [scripts/sprint-alpha.py](scripts/sprint-alpha.py) détoure chaque
-  image hors ligne (fond = ce qui touche le bord du cadre, donc les yeux blancs restent opaques ;
-  les bordures sont épaissies de quelques pixels pour que le fond ne fuie pas dans un œil par une brèche
-  de son liséré ; ombres du sol conservées, translucides) et écrit `fruit-sprint-footer.alpha.mp4` : un `.mp4`
-  ordinaire, couleur en moitié haute et masque en moitié basse, que le shader WebGL du composant
-  recompose dans un canvas transparent. Pour régénérer : `pip install numpy scipy` puis
-  `python3 scripts/sprint-alpha.py` (ffmpeg requis, environ 1 min 30). Si la vidéo change, ajuster
-  `CROP` et `FLOOR_Y` dans le script, et `SIZE` dans le composant. Rien n'est téléchargé avant que le
-  pied de page approche, lecture en pause hors écran, composant absent sous `prefers-reduced-motion`
-  ou sans WebGL. Taille à l'écran : une seule variable CSS, `--sprint-h` (dans `assets/css/main.css`).
+- **Personnages debout sur le pied de page** ([components/FooterFruits.vue](components/FooterFruits.vue)) :
+  dix personnages-fruits (fournis par le client, détourés — voir plus bas), debout côte à côte sur
+  l'arête haute du pied de page, suivent vraiment le curseur en 2D : un personnage sous le curseur reste
+  droit, un personnage loin dans un coin penche selon l'angle réel vers lui (`atan2` depuis les pieds de
+  chaque personnage jusqu'au curseur, un tampon vertical adoucit la réponse plutôt que de saturer d'un
+  coup — même formule que le composant de référence fourni par le client, voir plus bas). Le tampon est
+  plancé à un minimum (40 px) plutôt que de pouvoir descendre à zéro ou en dessous : le curseur passe
+  souvent sous la rangée (le pied de page, juste en dessous, est plein de liens), et sans ce plancher
+  l'angle traversait ±180° à cet endroit — le personnage pouvait alors basculer d'un coup entre gauche et
+  droite pour un curseur pourtant centré, un vrai bug rencontré et corrigé en cours de route.
+  **Le virage** (`rotateY`, avec un peu de `rotateZ` en accompagnement) donne l'impression que le
+  personnage se tourne vers le curseur plutôt que de simplement pencher à plat dans l'écran (un `rotate`
+  2D ne peut jamais donner cette impression, quel que soit l'angle) — un vrai profil demanderait un second
+  dessin de côté, qu'on n'a pas ; c'est une image plate qui se rétrécit comme une carte qui pivote, pas un
+  personnage qui tourne en 3D.
+  Comme les coordonnées (`getBoundingClientRect`, `clientX`/`clientY`) sont toutes relatives à la fenêtre
+  et non à la page, l'écart reste borné à ce qui est réellement visible à l'écran, même sur une page
+  longue. Une
+  bande réservée au-dessus du pied de page, sous le dernier contenu de la page (`--footfruit-h`, `main`
+  au-dessus en `z-index`), même mécanique que l'ancienne version en vidéo ci-dessous. Sur téléphone, un
+  personnage sur trois passé 900 px, un sur six passé 600 px (dix seraient minuscules). Absent sous
+  `prefers-reduced-motion` : aucun écouteur de souris, les personnages restent immobiles. Ils courent
+  maintenant aussi sur `/contact`, contrairement à la version vidéo (l'exclusion ne visait qu'un défaut de
+  cette vidéo précise, absent ici).
+  **Les images** viennent de [components/minimaxH3/piedPage/fruits-nuxt-scene/](components/minimaxH3/piedPage/fruits-nuxt-scene/)
+  (un composant de référence fourni par le client, avec dix images de stock sur fond de studio blanc) :
+  seul le principe (un fruit qui penche vers le curseur) et les images sont repris, pas le composant lui-
+  même, réécrit pour ce projet. [scripts/footfruit-alpha.py](scripts/footfruit-alpha.py) détoure chaque
+  image (fond de studio, parfois légèrement vignetté -> vraie transparence, PNG avec canal alpha ; pas de
+  couleur de page cuite en dur comme pour la bouteille, puisque le fond au-dessus du pied de page change
+  selon la page) et écrit dans `components/minimaxH3/piedPage/web/` (seul ce dossier est suivi par git,
+  pas le reste du dossier de référence — voir `.gitignore`). **Limite connue** : les gants blancs de
+  plusieurs personnages (banane, noix de coco...) sont, sur l'image source, presque exactement de la
+  couleur du fond — la transparence y est donc partielle plutôt que franche. Invisible sur le fond clair
+  réel de la page (vérifié), visible seulement sur un fond très sombre, un cas que cette rangée ne
+  rencontre pas en usage normal (elle est toujours posée sur le fond clair d'une page, juste au-dessus du
+  pied de page). Pour régénérer : `pip install numpy scipy pillow` puis `python3 scripts/footfruit-alpha.py`.
+  **Essayé puis abandonné** : faire tourner la fraise, la pastèque et l'orange en vraie 3D avec des
+  vidéos d'orbite scrubbées au curseur (même principe que `BottleScroll` mais piloté par la souris plutôt
+  que le scroll). Techniquement fonctionnel, filigrane et recadrage réglés, mais le rendu ne convainquait
+  pas à l'usage — retiré du projet, retour à ces dix personnages en image partout.
+- **Course au bord du pied de page — ancienne version, plus appelée** ([components/FooterSprint.vue](components/FooterSprint.vue)) :
+  trois fruits (fraise, banane, pastèque) traversaient le bas de la page de temps en temps. Vidéo générée
+  avec MiniMax H3 ([components/minimaxH3/](components/minimaxH3/), prompt et fiche de tâche à côté),
+  filmée sur fond de studio blanc, caméra qui suit les personnages : ils courent sur place, et c'est GSAP
+  qui faisait glisser la vidéo d'un bord à l'autre. **Le fond était retiré par un vrai canal alpha**, pas
+  par un mode de fusion CSS (qui n'est pas respecté partout sur une vidéo) :
+  [scripts/sprint-alpha.py](scripts/sprint-alpha.py) détoure chaque image hors ligne (fond = ce qui
+  touche le bord du cadre, donc les yeux blancs restent opaques ; les bordures sont épaissies de
+  quelques pixels pour que le fond ne fuie pas dans un œil par une brèche de son liséré ; ombres du sol
+  conservées, translucides) et écrit `fruit-sprint-footer.alpha.mp4` : un `.mp4` ordinaire, couleur en
+  moitié haute et masque en moitié basse, qu'un shader WebGL recomposait dans un canvas transparent. Le
+  fichier reste dans le dépôt et le composant fonctionne toujours ; seul `TheFooter.vue` ne l'appelle
+  plus. Il avait un défaut irrécupérable : le blanc du petit œil de profil de la banane est, dans la
+  vidéo source, exactement de la couleur du fond de studio, sans aucun contour — d'où l'exclusion sur
+  `/contact` (liste `NO_SPRINT`) et, avant elle, la bande réservée qui garantissait un fond uni derrière
+  les fruits.
 - **Personnages-fruits** ([components/FruitBuddy.vue](components/FruitBuddy.vue)) : un fruit-tête
   habillé en enfant (salopette, t-shirt rayé, baskets) par parfum, avec l'emblème de la boisson sur
   la poche — mangue/soleil, fraise/étoile, pomme/feuille, poire/vague, myrtille/nuage,
