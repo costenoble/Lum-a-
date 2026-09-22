@@ -92,7 +92,14 @@
       </div>
 
       <!-- RÉCAPITULATIF -->
-      <aside class="summary" v-reveal>
+      <!-- La colonne (aside) s'étire sur toute la hauteur de la ligne de grille
+           (celle des articles, plus haute) : c'est elle qui donne à .summary,
+           collante, la place où « voyager » pendant le scroll — voir le
+           commentaire CSS de .summary-col pour le bug que ça corrige. La carte
+           visible (fond, coins arrondis) est sur le <div> intérieur, pas ici :
+           sinon c'est ce fond qui s'étirerait sur toute la hauteur. -->
+      <aside class="summary-col">
+        <div class="summary" v-reveal>
         <h2 class="eyebrow">Récapitulatif</h2>
 
         <dl class="summary__rows">
@@ -150,6 +157,7 @@
         <p class="summary__note muted">
           Expédition sous 48 h · consigne remboursée en point de vente
         </p>
+        </div>
       </aside>
     </section>
   </div>
@@ -297,6 +305,12 @@ function drawConfirmation() {
 .page-head {
   padding-block: calc(var(--header-h) + 6rem) var(--sp-4);
 }
+/* Portée à cette page seulement (style scoped) : les autres titres de page
+   (Studio, Boutique, Contact...) partagent la même classe .page-head mais
+   restent en noir. */
+.page-head h1 {
+  color: var(--accent);
+}
 
 /* --- vide ----------------------------------------------------------------- */
 .empty {
@@ -322,7 +336,9 @@ function drawConfirmation() {
   grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
   gap: clamp(2rem, 5vw, 4.5rem);
   padding-bottom: var(--sp-6);
-  align-items: start;
+  /* Pas de align-items: start ici : la colonne de droite doit s'étirer sur
+     toute la hauteur de la ligne de grille (celle des articles, plus haute)
+     — voir .summary-col. */
 }
 .line {
   display: grid;
@@ -406,6 +422,17 @@ function drawConfirmation() {
 }
 
 /* --- récapitulatif -------------------------------------------------------- */
+/* Colonne invisible (pas de fond, pas de padding) qui s'étire sur toute la
+   hauteur de la ligne de grille : sans elle, .summary (sticky) n'avait pour
+   conteneur que sa propre hauteur de contenu — à peine plus que sa propre
+   taille, donc rien pour « voyager ». Avec beaucoup d'articles dans le panier
+   (colonne de gauche bien plus haute), l'encart décrochait alors presque
+   aussitôt et repartait avec le défilement normal jusqu'à sortir de l'écran
+   par le haut : le bouton Commander devenait inatteignable, quoi qu'on
+   scrolle. Un vrai bug, pas juste un réglage à affiner. */
+.summary-col {
+  min-width: 0;
+}
 .summary {
   position: sticky;
   top: calc(var(--header-h) + 2rem);
