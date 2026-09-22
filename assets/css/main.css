@@ -26,10 +26,11 @@
      font-display: swap;
    }
 
-   En attendant, Archivo + Inter (Google Fonts) tiennent le même rôle :
-   grotesque serrée pour le display, linéale neutre pour le texte courant.
-   Pour passer en auto-hébergé sans licence, `nuxt-google-fonts` sait aussi
-   télécharger et servir Archivo/Inter en local.
+   Le client a depuis choisi DynaPuff (Google Fonts, libre, aucune licence à
+   acheter) comme police du site, pour le display et le texte courant : ce
+   n'est plus un simple remplaçant provisoire d'Alliance Neue, mais la
+   direction retenue. Le bloc ci-dessus reste au cas où cette police
+   commerciale serait un jour reprise à la place.
    ===================================================================== */
 
 /* =====================================================================
@@ -49,8 +50,8 @@
   --line: rgba(15, 15, 15, 0.14);
   --line-dark: rgba(243, 242, 239, 0.16);
 
-  --font-display: 'Archivo', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  --font-display: 'DynaPuff', sans-serif;
+  --font-body: 'DynaPuff', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
   --fs-hero: clamp(3rem, 11vw, 11rem);

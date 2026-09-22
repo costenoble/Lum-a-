@@ -98,7 +98,7 @@ export function labelTexture(name: string, color: string) {
   for (let i = 0; i < 2; i++) {
     const x = canvas.width * ((i + 0.5) / 2)
     c.fillStyle = color
-    c.font = '700 170px Archivo, Helvetica, sans-serif'
+    c.font = '700 170px DynaPuff, Helvetica, sans-serif'
     c.fillText(name.toUpperCase(), x, 205)
     c.fillStyle = 'rgba(15,15,15,0.5)'
     c.font = '500 46px "JetBrains Mono", monospace'
