@@ -50,8 +50,14 @@ import posterSrc from '~/components/minimaxH3/bottle/web/comete-poster.jpg'
 const SRC = videoSrc
 const POSTER = posterSrc
 
-/** Vitesse à laquelle la vidéo rattrape le scroll : 0 = jamais, 1 = instantané. */
-const FOLLOW = 0.22
+/**
+ * Constante de temps du lissage, en ms : en ce temps, la vidéo a parcouru 63 % de l'écart
+ * qui la sépare du scroll. Une durée, et non un coefficient « par image » : avec un
+ * coefficient fixe (0,22 à chaque image), l'écran 120 Hz rattraperait le scroll deux fois
+ * plus vite que l'écran 60 Hz. Ici le rendu est le même à toutes les fréquences.
+ * 67 ms reproduit exactement l'ancien réglage à 60 Hz.
+ */
+const TAU = 67
 
 const { $reduceMotion } = useNuxtApp()
 
@@ -99,11 +105,16 @@ onMounted(() => {
   // --- suivi du scroll ---
   let target = 0 // avancement visé, 0 → 1
   let shown = 0 // instant affiché, en secondes
-  const tick = () => {
+  let last = 0 // horodatage de l'image précédente
+  const tick = (now: number) => {
     raf = requestAnimationFrame(tick)
+    // Durée réelle écoulée, plafonnée : un onglet resté en arrière-plan ne doit pas
+    // provoquer un saut au retour.
+    const dt = last ? Math.min(100, now - last) : 1000 / 60
+    last = now
     if (!loaded || !Number.isFinite(v.duration)) return
     const goal = target * (v.duration - 0.03) // jamais tout au bout : la dernière image ne se décode pas
-    shown += (goal - shown) * FOLLOW
+    shown += (goal - shown) * (1 - Math.exp(-dt / TAU))
     if (Math.abs(goal - shown) < 0.004) shown = goal
     // Une demi-image d'écart suffit à demander un saut, mais jamais pendant un saut.
     if (!v.seeking && Math.abs(v.currentTime - shown) > 0.02) v.currentTime = shown
@@ -124,7 +135,10 @@ onMounted(() => {
     ([entry]) => {
       if (entry?.isIntersecting) {
         load()
-        if (!raf) tick()
+        if (!raf) {
+          last = 0
+          raf = requestAnimationFrame(tick)
+        }
       } else {
         cancelAnimationFrame(raf)
         raf = 0
