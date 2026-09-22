@@ -511,7 +511,10 @@ main {
   overflow: hidden;
 }
 .transition-overlay span {
-  background: var(--night);
+  /* Noir pur, pas --night (#0b0b0b) : même choix que le fond du menu (.nav-overlay)
+     et pour la même raison — un rideau qui couvre tout l'écran doit être aussi
+     sombre que possible entre deux pages claires, sans teinte perceptible. */
+  background: #000;
   transform: scaleY(0);
   will-change: transform;
   /* Une largeur de viewport rarement divisible par 3 laisse un demi-pixel

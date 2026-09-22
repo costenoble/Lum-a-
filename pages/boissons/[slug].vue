@@ -124,6 +124,12 @@ useHead({ title: `${drink.name} — ${drink.fruit} · Luméa` })
 </script>
 
 <style scoped>
+/* --accent est déjà reteinté à la couleur du parfum sur le div racine (voir le
+   template) : le point de l'eyebrow en profite déjà, le titre n'avait pas encore
+   la sienne. */
+.case-head h1 {
+  color: var(--accent);
+}
 .buy {
   display: flex;
   flex-wrap: wrap;
