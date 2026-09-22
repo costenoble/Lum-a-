@@ -27,10 +27,13 @@
    }
 
    Le client a depuis choisi DynaPuff (Google Fonts, libre, aucune licence à
-   acheter) comme police du site, pour le display et le texte courant : ce
-   n'est plus un simple remplaçant provisoire d'Alliance Neue, mais la
-   direction retenue. Le bloc ci-dessus reste au cas où cette police
-   commerciale serait un jour reprise à la place.
+   acheter) comme police du site : ce n'est plus un simple remplaçant
+   provisoire d'Alliance Neue, mais la direction retenue. Elle ne tient
+   toutefois que les titres et sous-titres (--font-display) ; le texte
+   courant est en JetBrains Mono (--font-body, déjà chargée pour les petites
+   étiquettes du site), à la demande du client. Le bloc ci-dessus reste au
+   cas où la police commerciale serait un jour reprise à la place de
+   DynaPuff.
    ===================================================================== */
 
 /* =====================================================================
@@ -50,8 +53,16 @@
   --line: rgba(15, 15, 15, 0.14);
   --line-dark: rgba(243, 242, 239, 0.16);
 
+  /* Deux polices, pas une seule : DynaPuff pour les titres et sous-titres (tout ce
+     qui est déjà explicitement sur --font-display : h1-h4, logo, liens du menu,
+     manifeste, chiffres clés, bandeau défilant...), JetBrains Mono pour le texte
+     courant (les paragraphes, hérité de `body` par tout ce qui n'a pas d'autre
+     règle). Elle était déjà chargée et déjà utilisée sur le site (heure, horaires,
+     "Faites défiler"...) : le client a demandé cette police précise pour les
+     paragraphes en la montrant sur le site lui-même, rien à ajouter au chargement
+     des polices (nuxt.config.ts). */
   --font-display: 'DynaPuff', sans-serif;
-  --font-body: 'DynaPuff', sans-serif;
+  --font-body: 'JetBrains Mono', monospace;
   --font-mono: 'JetBrains Mono', monospace;
 
   --fs-hero: clamp(3rem, 11vw, 11rem);
@@ -396,7 +407,7 @@ main {
 .header__brand {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 1.35rem;
+  font-size: 1.7rem;
   letter-spacing: -0.05em;
 }
 
@@ -611,7 +622,7 @@ main {
   transition: color 0.3s linear;
 }
 .manifesto .w.on {
-  color: var(--ink);
+  color: var(--accent);
 }
 
 /* =====================================================================
