@@ -1,9 +1,8 @@
 <template>
-  <footer class="night footer" :class="{ 'footer--sprint': showSprint }">
-    <!-- Trois fruits qui traversent le bord du pied de page de temps en temps, sauf sur les
-         pages listées dans NO_SPRINT. Le v-if démonte le composant en navigation : sa vidéo,
-         son contexte WebGL et ses minuteries sont libérés en quittant la page. -->
-    <FooterSprint v-if="showSprint" />
+  <footer class="night footer footer--fruits">
+    <!-- Les six personnages-fruits, debout sur l'arête du pied de page, qui se
+         penchent vers le curseur. -->
+    <FooterFruits />
 
     <div class="container">
       <p class="eyebrow">Parlons-en</p>
@@ -60,11 +59,6 @@
 <script setup lang="ts">
 const year = new Date().getFullYear()
 
-// Pages où les fruits ne courent pas.
-const NO_SPRINT = ['/contact']
-const route = useRoute()
-const showSprint = computed(() => !NO_SPRINT.includes(route.path.replace(/\/+$/, '') || '/'))
-
 // Horloge locale : rendue vide au SSR pour éviter un mismatch d'hydratation,
 // remplie à la première frame client puis rafraîchie chaque minute.
 const time = ref('')
@@ -83,14 +77,14 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Repère de position pour FooterSprint, posé sur l'arête haute du pied de page. */
+/* Repère de position pour FooterFruits, posé sur l'arête haute du pied de page. */
 .footer {
   position: relative;
 }
-/* Les fruits courent dans une bande de fond, au-dessus du pied de page, sous le dernier
-   contenu. Elle a la hauteur de la piste, moins le vide qu'une page a déjà en bas (le
-   padding d'une section) : on n'ajoute que ce qui manque. */
-.footer--sprint {
-  margin-top: max(0px, calc(var(--sprint-h) - var(--sp-6)));
+/* Les personnages débordent au-dessus du pied de page, sous le dernier contenu de la
+   page : celle-ci réserve exactement la hauteur qui manque (la hauteur des personnages,
+   moins le vide qu'une page a déjà en bas). */
+.footer--fruits {
+  margin-top: max(0px, calc(var(--footfruit-h) - var(--sp-6)));
 }
 </style>

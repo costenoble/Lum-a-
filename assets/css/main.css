@@ -88,6 +88,10 @@
   /* Hauteur de la piste des fruits qui courent au-dessus du pied de page (FooterSprint).
      Partagée : le pied de page en tire la place qu'il doit réserver. */
   --sprint-h: clamp(180px, 30vw, 450px);
+  /* Hauteur des personnages-fruits debout sur l'arête du pied de page (FooterFruits) :
+     leurs images sont presque carrées (1024 x 943), donc nettement moins hautes que
+     larges. Partagée : le pied de page en tire la place qu'il doit réserver. */
+  --footfruit-h: clamp(48px, 6vw, 90px);
 }
 
 /* =====================================================================
