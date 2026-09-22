@@ -46,6 +46,26 @@ npm run generate # version 100 % statique
 - **Curseur maison** ([components/CustomCursor.vue](components/CustomCursor.vue)) : point qui suit
   la souris et devient une pastille libellée au survol de tout élément portant
   `data-cursor="Voir"`. Inactif au tactile et en `prefers-reduced-motion`.
+- **Vidéo du menu** ([components/NavOverlay.vue](components/NavOverlay.vue)) : à l'ouverture, une petite
+  vignette apparaît en haut à droite du panneau (sous « Panier »/« Fermer », à côté de la liste de
+  liens) — un personnage qui écrit « MENU » à la craie sur un tableau noir, généré avec MiniMax H3
+  ([components/minimaxH3/menu/](components/minimaxH3/menu/)). La vignette reprend presque exactement
+  le ratio de la vidéo source (1934 × 1080) : `object-fit: cover` n'a alors quasiment rien à rogner,
+  le mot reste entier à toutes les tailles d'écran — une première version en plein fond du panneau
+  s'est révélée illisible sur téléphone (l'essentiel du cadre coupé sur les côtés). La vidéo est
+  chargée en mémoire (Blob) dès le montage du panneau, pas seulement à l'ouverture : au premier
+  clic, `preload` seul ne garantit rien (voir HeroVideo plus bas), et un fichier de 1,1 Mo tient
+  largement en mémoire pour toute la session. Elle repart du début à chaque ouverture et se met en
+  pause à la fermeture ; sous `prefers-reduced-motion`, jamais chargée, l'image d'attente (le mot
+  déjà écrit) suffit. La balise `<video>` reste toujours dans le DOM, y compris pour ces visiteurs :
+  la conditionner avec `v-if="!$reduceMotion"` provoquerait un écart entre le rendu serveur (qui ne
+  connaît jamais cette préférence) et le client, un vrai bug rencontré en cours de route.
+  Contrairement aux autres vidéos MiniMax du site, le filigrane du fournisseur n'est pas limité aux
+  premières images : il est présent sur les 141 images, dans le même coin bas-droit, sur un fond
+  resté uniformément noir pur à cet endroit sur toute la vidéo (vérifié image par image : le
+  personnage n'y entre jamais, ses pieds restent sur la partie gauche du cadre). Un rectangle noir
+  est donc peint dessus (`drawbox`, [scripts/menu-video.sh](scripts/menu-video.sh)) plutôt que rogné
+  comme pour le hero ou la bouteille — un rognage aurait coupé les pieds du personnage.
 - **Univers de la Source au scroll** ([components/FabricationScene.vue](components/FabricationScene.vue)) :
   un bloc haut, un visuel collant, et la position de scroll qui donne un `progress` (0 → 1). Le
   décor ([components/UniverseScene.vue](components/UniverseScene.vue)) est un SVG en couches — ciel,

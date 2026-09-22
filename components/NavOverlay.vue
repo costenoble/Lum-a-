@@ -49,15 +49,48 @@
       <a :href="`tel:${site.phone.replace(/\s/g, '')}`" class="link-under">{{ site.phone }}</a>
       <span>{{ site.address.join(' · ') }}</span>
     </div>
+
+    <!-- Le personnage qui écrit « MENU » à la craie, joué une fois à l'ouverture.
+         Une petite vignette calée en haut à droite, sous Panier/Fermer — pas un
+         fond plein écran : sans mouvement, l'image d'attente montre directement
+         le mot déjà écrit. -->
+    <video
+      ref="introVideo"
+      class="nav-overlay__video"
+      :poster="menuPoster"
+      muted
+      playsinline
+      preload="none"
+      disablepictureinpicture
+      aria-hidden="true"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import gsap from 'gsap'
+import menuVideoSrc from '~/components/minimaxH3/menu/menu.web.mp4'
+import menuPoster from '~/components/minimaxH3/menu/menu-poster.jpg'
 
 const navOpen = useNavOpen()
 const root = ref<HTMLElement | null>(null)
+const introVideo = ref<HTMLVideoElement | null>(null)
 const { $reduceMotion, $lenis } = useNuxtApp()
+
+// Chargée en mémoire dès le montage (elle vit toute la session, pas seulement le
+// temps où le menu est ouvert) : au premier clic sur « Menu », elle doit démarrer
+// tout de suite. `preload` n'est qu'un souhait pour le navigateur — sans lancer la
+// lecture au moins une fois, certains ne téléchargent rien tant qu'on ne le leur
+// demande pas (voir HeroVideo) ; charger le fichier soi-même en Blob le garantit.
+let videoReady: Promise<void> | null = null
+if (import.meta.client && !$reduceMotion) {
+  videoReady = fetch(menuVideoSrc)
+    .then((r) => r.blob())
+    .then((blob) => {
+      if (introVideo.value) introVideo.value.src = URL.createObjectURL(blob)
+    })
+    .catch(() => {}) // hors ligne, ou fetch refusé : elle restera sur son image d'attente
+}
 
 // Le panneau se dévoile par clip-path (rideau du haut), les entrées montent
 // derrière leur masque. On garde une seule timeline, reconstruite à chaque
@@ -85,6 +118,18 @@ watch(navOpen, (open) => {
     gsap.set(el, { autoAlpha: open ? 1 : 0, clipPath: 'inset(0 0 0 0)' })
     gsap.set([items, meta], { yPercent: 0, autoAlpha: 1 })
     return
+  }
+
+  // La vidéo démarre tout de suite (« s'active » avec le clic), pas seulement une
+  // fois le rideau ouvert : elle joue pendant que le panneau se déploie.
+  if (open) {
+    const v = introVideo.value
+    if (v) {
+      v.currentTime = 0
+      ;(videoReady ?? Promise.resolve()).then(() => v.play().catch(() => {}))
+    }
+  } else {
+    introVideo.value?.pause()
   }
 
   tl = gsap.timeline()
@@ -119,3 +164,27 @@ onMounted(() => {
   onUnmounted(() => window.removeEventListener('keydown', onKey))
 })
 </script>
+
+<style scoped>
+/* Petite vignette, en haut à droite du panneau : sous « Panier »/« Fermer » (même
+   bord droit que l'en-tête, via --pad-inline), à côté de la liste des liens plutôt
+   qu'en fond plein écran. Le ratio reprend presque exactement celui de la vidéo
+   source (1934 x 1080) : « cover » n'a alors quasiment rien à rogner, le mot
+   « MENU » reste entier quelle que soit la taille de la vignette. */
+.nav-overlay__video {
+  position: absolute;
+  top: calc(var(--header-h) + 1.4rem);
+  right: var(--pad-inline);
+  width: clamp(296px, 34vw, 440px);
+  aspect-ratio: 1934 / 1080;
+  object-fit: cover;
+  pointer-events: none;
+}
+@media (max-width: 640px) {
+  /* Sous ce panneau, la liste de liens en gros caractères peut passer sous la
+     vignette : on la réduit encore pour ne rester que dans la marge du haut. */
+  .nav-overlay__video {
+    width: clamp(192px, 60vw, 260px);
+  }
+}
+</style>
