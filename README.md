@@ -99,8 +99,17 @@ npm run generate # version 100 % statique
   `components/minimaxH3/bottle/lumea-scroll/work/args_*.json` contiennent des liens signés : ne pas les
   versionner.
 - **Course au bord du pied de page** ([components/FooterSprint.vue](components/FooterSprint.vue)) :
-  trois fruits (fraise, banane, pastèque) traversent l'arête du pied de page de temps en temps, à
-  trois fois la taille d'origine. Vidéo générée avec MiniMax H3 ([components/minimaxH3/](components/minimaxH3/),
+  trois fruits (fraise, banane, pastèque) traversent le bas de la page de temps en temps, à trois fois
+  la taille d'origine. **Ils courent dans une bande réservée** au-dessus du pied de page, sous le dernier
+  contenu : le pied de page réserve exactement la place qui manque (`--sprint-h`, la hauteur de la piste,
+  moins le vide qu'une page a déjà en bas), et `main` a un `z-index` au-dessus d'eux. Résultat : derrière
+  un fruit, il n'y a jamais que le fond du site, donc un défaut de détourage se fond dedans : le blanc
+  manquant du petit œil de profil de la banane (identique au fond de studio dans la vidéo, donc
+  irrécupérable) prend la couleur de la page au lieu de laisser voir une lettre ou une photo. Ils ne courent pas sur `/contact` (liste `NO_SPRINT` dans
+  [components/TheFooter.vue](components/TheFooter.vue) ; le composant est démonté, la vidéo n'y est jamais
+  téléchargée). Une page dont la fin a moins de vide que le standard doit lui redonner
+  `padding-bottom: var(--sp-6)` (comme `.next-case`), sinon le contenu passe devant le haut des fruits.
+  Vidéo générée avec MiniMax H3 ([components/minimaxH3/](components/minimaxH3/),
   prompt et fiche de tâche à côté). Elle est filmée sur fond de studio blanc, caméra qui suit les
   personnages : ils courent sur place, et c'est GSAP qui fait glisser la vidéo d'un bord à l'autre.
   **Le fond est retiré par un vrai canal alpha**, pas par un mode de fusion CSS (qui n'est pas
@@ -113,7 +122,7 @@ npm run generate # version 100 % statique
   `python3 scripts/sprint-alpha.py` (ffmpeg requis, environ 1 min 30). Si la vidéo change, ajuster
   `CROP` et `FLOOR_Y` dans le script, et `SIZE` dans le composant. Rien n'est téléchargé avant que le
   pied de page approche, lecture en pause hors écran, composant absent sous `prefers-reduced-motion`
-  ou sans WebGL. Taille à l'écran : une seule variable CSS, `--h`.
+  ou sans WebGL. Taille à l'écran : une seule variable CSS, `--sprint-h` (dans `assets/css/main.css`).
 - **Personnages-fruits** ([components/FruitBuddy.vue](components/FruitBuddy.vue)) : un fruit-tête
   habillé en enfant (salopette, t-shirt rayé, baskets) par parfum, avec l'emblème de la boisson sur
   la poche — mangue/soleil, fraise/étoile, pomme/feuille, poire/vague, myrtille/nuage,

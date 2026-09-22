@@ -72,6 +72,10 @@
   --radius-photo: 20px;
   --ease-soft: cubic-bezier(0.22, 0.9, 0.32, 1);
   --header-h: 84px;
+
+  /* Hauteur de la piste des fruits qui courent au-dessus du pied de page (FooterSprint).
+     Partagée : le pied de page en tire la place qu'il doit réserver. */
+  --sprint-h: clamp(180px, 30vw, 450px);
 }
 
 /* =====================================================================
@@ -163,6 +167,15 @@ h4 {
 /* =====================================================================
    LAYOUT PRIMITIVES
    ===================================================================== */
+/* Le contenu de la page passe toujours au-dessus des fruits du pied de page. Ils courent
+   dans une bande réservée, mais si une page laisse moins de place que prévu, ce sont eux
+   qui passent derrière un texte ou une photo, jamais l'inverse : derrière les fruits, il n'y
+   a alors que le fond du site. */
+main {
+  position: relative;
+  z-index: 1;
+}
+
 .container {
   max-width: var(--container);
   margin-inline: auto;
@@ -933,7 +946,9 @@ h4 {
 }
 .next-case {
   display: block;
-  padding-block: var(--sp-5);
+  /* Le bas reprend le vide standard d'une fin de page (comme .section) : c'est lui que le pied
+     de page compte, pour réserver la piste des fruits qui courent. */
+  padding-block: var(--sp-5) var(--sp-6);
   text-align: center;
 }
 

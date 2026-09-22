@@ -262,7 +262,7 @@ onUnmounted(() => {
    taille de départ : c'est cette seule variable qui règle la taille des fruits
    (de 180 px sur téléphone à 450 px sur grand écran). */
 .sprint {
-  --h: clamp(180px, 30vw, 450px);
+  --h: var(--sprint-h);
   position: absolute;
   inset-inline: 0;
   bottom: 100%;
