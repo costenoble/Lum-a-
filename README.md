@@ -46,38 +46,29 @@ npm run generate # version 100 % statique
 - **Curseur maison** ([components/CustomCursor.vue](components/CustomCursor.vue)) : point qui suit
   la souris et devient une pastille libellée au survol de tout élément portant
   `data-cursor="Voir"`. Inactif au tactile et en `prefers-reduced-motion`.
-- **Vol scrollé sur /fabrication** ([components/FabricationFlight.vue](components/FabricationFlight.vue),
-  [assets/js/scroll-flight.js](assets/js/scroll-flight.js)) : deux orbites de bouteille (bouchon vu
-  d'en haut → profil → base), scrubées par le scroll comme `BottleScroll`, mais à plein écran et
-  chaînées l'une après l'autre, avec un texte épinglé par chapitre (éphémère : `overlayEnter` /
-  `overlayExit` par section) et une petite navigation à points sur le bord droit. Le moteur est une
-  adaptation du « scroll-world » fourni par le client
-  ([components/minimaxH3/bottle/lumea-scroll/site/](components/minimaxH3/bottle/lumea-scroll/site/)) :
-  vanilla JS, sans dépendance, il construit son propre DOM dans le conteneur qu'on lui donne. Deux
-  changements par rapport à l'original (voir l'en-tête du fichier) : il renvoie maintenant
-  `{ destroy() }` pour retirer proprement ses écouteurs `window` — l'original les gardait à vie, pensé
-  pour une page unique, alors que Luméa est une SPA où l'on peut quitter /fabrication puis y revenir
-  sans jamais recharger — et l'ancrage plein écran (`position: fixed`) est devenu un ancrage collant
-  (`position: sticky` dans un conteneur de la bonne hauteur, exactement le principe de `BottleScroll`) :
-  cette scène n'est qu'une section parmi d'autres sur la page, pas la page entière comme dans la démo
-  d'origine. Les deux vidéos viennent du même dossier que la bouteille Comète de l'accueil ; préparées
-  avec `scripts/bottle-video.py` (fond cuit à la couleur du site, filigrane retiré — chacune avait un
-  nombre d'images de filigrane différent, mesuré au cas par cas). Les deux flacons (banane, pastèque)
-  sont des essais MiniMax, pas des parfums du catalogue : le texte reste centré sur le geste de
-  fabrication (pressage, mise en bouteille), jamais sur le nom du fruit, pour ne pas laisser croire que
-  ce sont des parfums en vente. L'ancienne scène (« Univers de la Source », un SVG en couches parallaxe
-  tiré de l'illustration du client) reste dans le dépôt sans être appelée — voir
+- **Vol scrollé sur /fabrication** ([components/FabricationFlight.vue](components/FabricationFlight.vue)) :
+  deux `BottleScroll` chaînés l'un après l'autre dans le flux normal de la page — même composant, même
+  principe que la bouteille Comète de l'accueil (texte à gauche, bouteille à droite ; empilés sur
+  téléphone), juste utilisé deux fois avec un texte et une vidéo différents à chaque fois. Dès que le
+  premier bloc relâche son épinglage, le second prend la main directement : rien entre les deux, pas de
+  chapitre de transition. Les deux vidéos viennent du même dossier que Comète ; préparées avec
+  `scripts/bottle-video.py` (fond cuit à la couleur du site, filigrane retiré — chacune avait un nombre
+  d'images de filigrane différent, mesuré au cas par cas). Les deux flacons (banane, pastèque) sont des
+  essais MiniMax, pas des parfums du catalogue : le texte reste centré sur le geste de fabrication
+  (pressage, mise en bouteille), jamais sur le nom du fruit, pour ne pas laisser croire que ce sont des
+  parfums en vente.
+  **Essayé puis abandonné** : un moteur plein écran emprunté au client (« scroll-world », vidéo bord à
+  bord avec texte en surimpression, navigation à points, fondu enchaîné vidéo entre les deux bouteilles
+  — voir l'historique Git). Le rendu ne convainquait pas et la mise en page (texte flottant sur la vidéo,
+  pas de colonne dédiée) ne correspondait pas à celle du reste du site — retour à `BottleScroll`, qui
+  l'avait déjà résolue.
+  `BottleScroll` est devenu un composant à propriété à cette occasion (`src` / `poster` / `scroll`,
+  plus de vidéo Comète codée en dur) : la page d'accueil lui passe désormais les siennes explicitement.
+  L'ancienne scène (« Univers de la Source », un SVG en couches parallaxe tiré de l'illustration du
+  client) reste dans le dépôt sans être appelée — voir
   [components/FabricationScene.vue](components/FabricationScene.vue) et
   [components/UniverseScene.vue](components/UniverseScene.vue) — même principe que `FooterSprint` plus
   haut : le fichier vit, la page ne l'appelle plus.
-  **Entre les deux bouteilles**, un connecteur (`connectors` dans la config du moteur — un chapitre
-  additionnel, sans texte, entre deux chapitres normaux) comble la coupure qui semblait trop sèche à
-  l'usage : `components/minimaxH3/bottle/web/fabrication-connector.mp4` est un vrai fondu enchaîné
-  (`ffmpeg xfade`, filtre `dissolve`) entre la dernière seconde de la vidéo banane et la première de la
-  vidéo pastèque — la bouteille se change littéralement en l'autre plutôt qu'un fondu géométrique entre
-  deux images sans rapport. Fabriqué à la main (pas par `scripts/bottle-video.py`, qui traite une seule
-  vidéo à la fois), donc pas de script à relancer si les deux vidéos changent — à refaire alors avec la
-  même commande `xfade`, voir l'historique Git de ce commit.
 - **Hero vidéo** ([components/HeroVideo.vue](components/HeroVideo.vue)) : au chargement, le rideau se
   lève sur une vidéo MiniMax H3 en plein écran, titre superposé. En défilant, le cadre rétrécit en une
   carte arrondie calée sur la colonne du site (un gabarit invisible mesure sa place exacte, donc elle
@@ -122,8 +113,10 @@ npm run generate # version 100 % statique
   script agrandit (x1,25) et affûte légèrement (la source est en 768p), rogne le début (`START_FRAME` : un
   zoom éclair depuis la photo de départ, qui porte aussi le filigrane du fournisseur) et compense l'écart de
   couleur du décodage vidéo (`DISPLAY_OFFSET`, mesuré dans Chrome : sans cela, la vidéo apparaîtrait de 2 à
-  3 niveaux plus claire que la page). Ajouter un parfum : lancer le script sur sa vidéo, puis faire de
-  `BottleScroll` un composant à propriété. Les fichiers de travail
+  3 niveaux plus claire que la page). `BottleScroll` est un composant à propriété (`src`, `poster`,
+  `scroll` — hauteurs d'écran de rotation, 3 par défaut) : ajouter un parfum, c'est lancer le script sur
+  sa vidéo, puis poser un nouveau `<BottleScroll :src :poster>` là où on le veut (voir `/fabrication`,
+  qui en chaîne deux). Les fichiers de travail
   `components/minimaxH3/bottle/lumea-scroll/work/args_*.json` contiennent des liens signés : ne pas les
   versionner.
 - **Personnages debout sur le pied de page** ([components/FooterFruits.vue](components/FooterFruits.vue)) :

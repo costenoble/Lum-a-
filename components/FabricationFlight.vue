@@ -1,18 +1,59 @@
 <template>
-  <div ref="root" class="fabrication-flight" />
+  <div>
+    <!-- Deux bouteilles, deux blocs BottleScroll indépendants, l'un après l'autre dans
+         le flux normal de la page : dès que le premier relâche son épinglage, le second
+         prend la main sans rien entre les deux — même mécanique que la bouteille Comète
+         de l'accueil, ici enchaînée deux fois. -->
+    <BottleScroll :src="bananaVideo" :poster="bananaPoster">
+      <div class="container fab-copy" v-reveal>
+        <p class="eyebrow">01 · Pressage à froid</p>
+        <h2>Le fruit passe sous la presse, jamais sous la flamme.</h2>
+        <p class="fab-copy__body">
+          Rien n’est chauffé, rien n’est ajouté. Chaque fruit vient d’un rayon de 200 km et
+          file en bouteille dans les 48 heures.
+        </p>
+        <ul class="fab-copy__tags">
+          <li>Pressage à froid</li>
+          <li>200 km</li>
+          <li>Sans additif</li>
+        </ul>
+      </div>
+    </BottleScroll>
+
+    <BottleScroll :src="watermelonVideo" :poster="watermelonPoster">
+      <div class="container fab-copy" v-reveal>
+        <p class="eyebrow">02 · Verre et bouchon</p>
+        <h2>Un bouchon de liège, un verre qu’on reprend.</h2>
+        <p class="fab-copy__body">
+          L’étiquette est monomatière, le verre consigné. La bouteille se garde six
+          semaines au frais — un choix, pas une contrainte subie.
+        </p>
+        <ul class="fab-copy__tags">
+          <li>Verre consigné</li>
+          <li>Monomatière</li>
+          <li>6 semaines</li>
+        </ul>
+        <NuxtLink to="/savoir-faire" class="btn btn--ghost fab-copy__cta" v-magnetic>
+          <span>Voir le savoir-faire</span>
+        </NuxtLink>
+      </div>
+    </BottleScroll>
+  </div>
 </template>
 
 <script setup lang="ts">
 // ---------------------------------------------------------------------------
-// Vol scrollé à travers deux orbites de bouteille (générées avec MiniMax H3,
-// fournies par le client dans components/minimaxH3/bottle/lumea-scroll/),
-// préparées par scripts/bottle-video.py (fond cuit à la couleur du site,
-// filigrane retiré, images clés rapprochées pour un défilement fluide — voir
-// les commentaires de ce script). Le moteur lui-même
-// (assets/js/scroll-flight.js) est une adaptation du "scroll-world" fourni
-// par le client : voir son en-tête pour ce qui a changé (nettoyage au
-// démontage, indispensable dans une SPA ; z-index abaissés sous ceux du
-// header et du menu).
+// Deux orbites de bouteille (générées avec MiniMax H3, fournies par le client
+// dans components/minimaxH3/bottle/lumea-scroll/), préparées par
+// scripts/bottle-video.py comme la bouteille Comète de l'accueil — même
+// composant (BottleScroll, devenu un composant à propriété pour l'occasion),
+// texte à gauche et bouteille à droite, exactement le même principe.
+//
+// Essayé puis abandonné : un moteur plein écran emprunté (« scroll-world »,
+// texte en surimpression sur une vidéo bord à bord, navigation à points,
+// fondu enchaîné vidéo entre les deux bouteilles). Le rendu ne convainquait
+// pas à l'usage et rendait la coupure entre les deux vidéos peu lisible —
+// retiré du projet (voir l'historique Git), retour à BottleScroll.
 //
 // Les deux flacons (banane, pastèque) sont des essais MiniMax, pas des
 // parfums du catalogue (Solaire, Comète, Prairie, Lagon, Nuage, Aurore) :
@@ -21,98 +62,46 @@
 // que ce sont des parfums en vente.
 // ---------------------------------------------------------------------------
 
-import { mountScrollWorld } from '~/assets/js/scroll-flight.js'
 import bananaVideo from '~/components/minimaxH3/bottle/web/fabrication-banana.mp4'
 import bananaPoster from '~/components/minimaxH3/bottle/web/fabrication-banana-poster.jpg'
 import watermelonVideo from '~/components/minimaxH3/bottle/web/fabrication-watermelon.mp4'
 import watermelonPoster from '~/components/minimaxH3/bottle/web/fabrication-watermelon-poster.jpg'
-import connectorVideo from '~/components/minimaxH3/bottle/web/fabrication-connector.mp4'
-
-const root = ref<HTMLElement | null>(null)
-let engine: { destroy: () => void } | null = null
-
-onMounted(() => {
-  if (!root.value) return
-
-  engine = mountScrollWorld(root.value, {
-    // 3,2 hauteurs d'écran par bouteille : assez pour que l'orbite (bouchon →
-    // profil → base) se déploie sans précipitation, sans pour autant peser sur
-    // le reste du défilement de la page (texte, marquee, CTA suivent en dessous).
-    diveScroll: 3.2,
-    hint: 'Faites défiler',
-    nav: false, // le site a déjà son propre menu ; pas de second, redondant
-    sections: [
-      {
-        id: 'pressage',
-        label: 'Pressage',
-        still: bananaPoster,
-        clip: bananaVideo,
-        accent: '#e3a73d',
-        // Par défaut, le moteur traite la première section comme un « accueil »
-        // qui s'efface dès 62 % du défilement (pensé pour un texte de bienvenue
-        // suivi d'un vrai second temps) — ici les deux sections se valent, le
-        // texte doit rester lisible presque tout du long des deux côtés.
-        overlayEnter: 0.08,
-        overlayExit: 0.92,
-        eyebrow: '01 · Pressage à froid',
-        title: 'Le fruit passe sous la presse, jamais sous la flamme.',
-        body: 'Rien n’est chauffé, rien n’est ajouté. Chaque fruit vient d’un rayon de 200 km et file en bouteille dans les 48 heures.',
-        tags: ['Pressage à froid', '200 km', 'Sans additif']
-      },
-      {
-        id: 'mise-en-bouteille',
-        label: 'Mise en bouteille',
-        still: watermelonPoster,
-        clip: watermelonVideo,
-        accent: '#e0677b',
-        overlayEnter: 0.08,
-        overlayExit: 0.92,
-        eyebrow: '02 · Verre et bouchon',
-        title: 'Un bouchon de liège, un verre qu’on reprend.',
-        body: 'L’étiquette est monomatière, le verre consigné. La bouteille se garde six semaines au frais — un choix, pas une contrainte subie.',
-        tags: ['Verre consigné', 'Monomatière', '6 semaines'],
-        cta: { primary: { label: 'Voir le savoir-faire', href: '/savoir-faire' } }
-      }
-    ],
-    // Sans connecteur, la coupure entre les deux bouteilles se sentait trop
-    // sèche (l'ambiance de fond flottait un instant, sans rien à regarder).
-    // Ce clip est un vrai fondu enchaîné, fabriqué à partir des vidéos
-    // existantes (dernière seconde de la banane, première de la pastèque,
-    // xfade ffmpeg) : la bouteille se change littéralement en l'autre, plutôt
-    // qu'un fondu enchaîné géométrique entre deux images sans rapport. Une
-    // demi-hauteur d'écran de scroll lui suffit : c'est une respiration, pas
-    // un troisième chapitre.
-    connScroll: 0.5,
-    connectors: [connectorVideo]
-  })
-
-  // Le moteur construit de simples <a href> (il ne connaît pas le routeur de
-  // Nuxt) : sans ceci, le lien de fin rechargerait la page entière plutôt que
-  // de naviguer côté client comme le reste du site.
-  root.value.querySelectorAll('a.sw-btn').forEach((a) => {
-    const href = a.getAttribute('href')
-    if (!href || !href.startsWith('/')) return
-    a.addEventListener('click', (e) => {
-      e.preventDefault()
-      navigateTo(href)
-    })
-  })
-})
-
-onUnmounted(() => engine?.destroy())
 </script>
 
 <style scoped>
-/* Reprend les jetons du site plutôt que les couleurs par défaut du moteur
-   (voir --sw-* dans assets/js/scroll-flight.js) : chaque bouteille garde son
-   accent propre (jaune, corail), mais le fond, l'encre et les polices restent
-   celles de Luméa. */
-.fabrication-flight {
-  --sw-bg: var(--paper);
-  --sw-ink: var(--ink);
-  --sw-ink-soft: var(--ink-soft);
-  --sw-accent: var(--accent);
-  --sw-font-display: var(--font-display);
-  --sw-font-body: var(--font-body);
+.fab-copy {
+  display: grid;
+  gap: var(--sp-3);
+  justify-items: start;
+  max-width: 34ch;
+}
+.fab-copy h2 {
+  font-size: var(--fs-h2);
+  line-height: 1.1;
+}
+.fab-copy__body {
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+.fab-copy__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.fab-copy__tags li {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  background: var(--paper-2);
+  color: var(--ink-soft);
+}
+.fab-copy__cta {
+  pointer-events: auto;
 }
 </style>

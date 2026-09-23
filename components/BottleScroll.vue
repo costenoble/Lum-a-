@@ -1,5 +1,10 @@
 <template>
-  <section ref="root" class="bs" :class="{ 'bs--static': fixed, 'bs--copy': !!$slots.default }">
+  <section
+    ref="root"
+    class="bs"
+    :class="{ 'bs--static': fixed, 'bs--copy': !!$slots.default }"
+    :style="{ '--bs-scroll': scroll }"
+  >
     <div class="bs__stage">
       <!-- Jamais lue : sa position dans le temps suit le scroll. Le fond de la vidéo est
            celui du site (cuit à la fabrication, cf. scripts/bottle-video.py) : elle n'a
@@ -26,13 +31,15 @@
 
 <script setup lang="ts">
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import videoSrc from '~/components/minimaxH3/bottle/web/comete.mp4'
-import posterSrc from '~/components/minimaxH3/bottle/web/comete-poster.jpg'
 
 // ---------------------------------------------------------------------------
 // Une bouteille qu'on fait tourner avec le scroll. La vidéo (une orbite de dix
 // secondes, générée avec MiniMax H3) n'est pas lue : le défilement de la zone
 // épinglée fixe l'instant affiché, du bouchon vu d'en haut jusqu'au verre.
+//
+// Composant à propriété : src/poster viennent de l'appelant (la page
+// d'accueil pour Comète, /fabrication pour les deux autres bouteilles).
+// Rien ici ne connaît le nom d'un parfum en particulier.
 //
 // Comme HeroVideo, la zone est haute et son contenu collant. Trois astuces,
 // reprises du moteur scroll-world, rendent le « scrub » fluide :
@@ -47,8 +54,19 @@ import posterSrc from '~/components/minimaxH3/bottle/web/comete-poster.jpg'
 // Rien ne charge tant que la section n'approche pas.
 // ---------------------------------------------------------------------------
 
-const SRC = videoSrc
-const POSTER = posterSrc
+const props = withDefaults(
+  defineProps<{
+    src: string
+    poster: string
+    /** Hauteurs d'écran de défilement pendant lesquelles la bouteille tourne
+     *  (en plus de l'écran de scène lui-même). Plus haut = rotation plus lente. */
+    scroll?: number
+  }>(),
+  { scroll: 3 }
+)
+const SRC = props.src
+const POSTER = props.poster
+const { scroll } = props
 
 /**
  * Constante de temps du lissage, en ms : en ce temps, la vidéo a parcouru 63 % de l'écart

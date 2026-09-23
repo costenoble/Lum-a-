@@ -39,7 +39,7 @@
 
     <!-- MANIFESTE, épinglé sur la bouteille qui tourne : le texte s'encre mot à mot au rythme
          de la rotation (la vidéo suit le scroll), et le lien apparaît à la fin. -->
-    <BottleScroll v-slot="{ progress }">
+    <BottleScroll :src="cometeVideo" :poster="cometePoster" v-slot="{ progress }">
       <div class="container manifesto-wrap">
         <p class="eyebrow" v-reveal>La marque</p>
         <ManifestoText
@@ -150,6 +150,9 @@
 </template>
 
 <script setup lang="ts">
+import cometeVideo from '~/components/minimaxH3/bottle/web/comete.mp4'
+import cometePoster from '~/components/minimaxH3/bottle/web/comete-poster.jpg'
+
 useHead({ title: 'Luméa — Boissons lumineuses pour les petits' })
 
 const featured = computed(() => drinks.slice(0, 3))
