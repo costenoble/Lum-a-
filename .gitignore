@@ -15,12 +15,15 @@ components/minimaxH3/**/work/
 components/minimaxH3/*-prompt.json
 components/minimaxH3/*-task-record.json
 
-# Le dossier de démo scroll-world et ses médias non utilisés par le site (seules la vidéo
-# source de la bouteille Comète et les vidéos web sont suivies).
+# Le dossier de démo scroll-world et ses médias non utilisés par le site (seules les
+# vidéos sources effectivement traitées par scripts/bottle-video.py et les vidéos web
+# qui en sortent sont suivies).
 components/minimaxH3/bottle/lumea-scroll/site/
 components/minimaxH3/bottle/lumea-scroll/prepared-media/
 components/minimaxH3/bottle/lumea-scroll/videos/*
 !components/minimaxH3/bottle/lumea-scroll/videos/lumea_strawberry_v2.mp4
+!components/minimaxH3/bottle/lumea-scroll/videos/lumea_banana_v2.mp4
+!components/minimaxH3/bottle/lumea-scroll/videos/lumea_watermelon_v2.mp4
 
 # Dossier de référence (démo Vue + images de stock brutes) dont FooterFruits.vue
 # reprend le principe (un fruit qui penche vers le curseur) et les images, une fois
