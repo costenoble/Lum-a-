@@ -11,6 +11,14 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  // Emplacement réservé pour Stripe (server/api/checkout.post.ts) : aucune clé
+  // n'est configurée ici. Le jour venu, une variable d'environnement
+  // STRIPE_SECRET_KEY (jamais commitée, dans .env) prendra automatiquement le
+  // dessus sur cette valeur vide, par la convention Nuxt NUXT_STRIPE_SECRET_KEY.
+  runtimeConfig: {
+    stripeSecretKey: ''
+  },
+
   app: {
     head: {
       htmlAttrs: { lang: 'fr' },

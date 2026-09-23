@@ -181,8 +181,34 @@ npm run generate # version 100 % statique
   [pages/panier.vue](pages/panier.vue) page complète) : lignes persistées dans
   `localStorage`, entrée en cascade et repli à la suppression (hooks JS de
   TransitionGroup pilotés par GSAP), total et jauge de franco animés, coche de
-  confirmation tracée au `stroke-dasharray`. Aucun paiement branché — `checkout()`
-  dans `pages/panier.vue` est le point d'accroche.
+  confirmation tracée au `stroke-dasharray`.
+  **Livraison** : `pages/panier.vue` a un formulaire (prénom, nom, e-mail,
+  téléphone, adresse, code postal, ville, pays), gardé dans `localStorage`
+  comme le panier lui-même ([composables/useCheckoutCustomer.ts](composables/useCheckoutCustomer.ts))
+  pour survivre à un rechargement. Le bouton Commander (dans le récapitulatif,
+  à droite) est rattaché au formulaire par son `id` (`form="checkout-form"`),
+  pas par imbrication : la validation (`required`, `type="email"`) est celle
+  du navigateur, rien à dupliquer en JS.
+  **Paiement — terrain préparé pour Stripe, pas branché** :
+  [server/api/checkout.post.ts](server/api/checkout.post.ts) reçoit les
+  coordonnées, les lignes et les montants exactement dans la forme dont Stripe
+  Checkout a besoin (`line_items`, `customer_email`...), valide les champs
+  obligatoires, mais ne contacte aucun prestataire — aucune clé n'est
+  configurée dans ce dépôt. Il renvoie une confirmation simulée
+  (`simulated: true`), que `checkout()` affiche comme avant. Le commentaire en
+  tête de fichier donne le code exact à ajouter le jour où une clé
+  `STRIPE_SECRET_KEY` existe (variable d'environnement, jamais commitée —
+  emplacement réservé dans `runtimeConfig`, [nuxt.config.ts](nuxt.config.ts)) :
+  `pages/panier.vue` redirige déjà vers `url` dès qu'elle est renseignée,
+  rien d'autre à changer côté client ce jour-là.
+- **Focus retenu sous aria-hidden** ([components/NavOverlay.vue](components/NavOverlay.vue),
+  [components/CartDrawer.vue](components/CartDrawer.vue)) : fermer le menu ou le tiroir panier juste
+  après avoir cliqué un lien qu'il contient (« Boissons », « Voir le panier »...) laissait ce lien
+  gardé le focus clavier pile au moment où le panneau passait en `aria-hidden="true"` — Chrome bloque
+  ça et le signale en erreur console à raison (un lecteur d'écran ne doit jamais perdre le focus sur
+  du contenu qu'il ne peut plus annoncer). Les deux composants blurrent l'élément actif s'il est
+  dans le panneau, juste avant/au moment de le masquer. Reproduit puis vérifié en désactivant puis
+  réactivant le correctif (le message d'erreur exact disparaît et revient à l'identique).
 
 ## Où modifier quoi
 
@@ -430,5 +456,8 @@ dur, donc rien d'autre à toucher.
 - Brancher un vrai endpoint dans `submit()` de [pages/contact.vue](pages/contact.vue).
 - Remplacer les mentions légales par les informations réelles de la société.
 - Remplacer les liens réseaux sociaux (placeholders) et ajouter un favicon dans `public/`.
-- Brancher un vrai paiement dans `checkout()` de [components/CartDrawer.vue](components/CartDrawer.vue)
-  (le panier est purement local aujourd'hui).
+- Brancher une vraie clé Stripe dans [server/api/checkout.post.ts](server/api/checkout.post.ts) — le
+  terrain est prêt (formulaire de livraison, route serveur au bon format), voir le commentaire en
+  tête de ce fichier et la section Panier plus haut. Le raccourci « Commander directement » de
+  [components/CartDrawer.vue](components/CartDrawer.vue) (sans passer par `pages/panier.vue`) reste lui
+  purement local, à aligner sur le même circuit le moment venu.

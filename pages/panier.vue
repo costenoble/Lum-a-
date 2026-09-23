@@ -89,6 +89,70 @@
         </TransitionGroup>
 
         <button class="clear link-under" @click="clear">Vider le panier</button>
+
+        <!-- Livraison : le bouton Commander (dans le récapitulatif, à droite)
+             est rattaché à ce formulaire par son id (form="checkout-form"),
+             pas besoin qu'il soit dedans. La validation (required, type=email)
+             est celle du navigateur : aucun contrôle JS à maintenir en double. -->
+        <form id="checkout-form" class="checkout-form" @submit.prevent="checkout" v-reveal>
+          <h2 class="eyebrow">Livraison</h2>
+          <div class="checkout-form__grid">
+            <div class="field">
+              <label for="prenom">Prénom</label>
+              <input id="prenom" v-model="customer.prenom" type="text" required autocomplete="given-name" />
+            </div>
+            <div class="field">
+              <label for="nom">Nom</label>
+              <input id="nom" v-model="customer.nom" type="text" required autocomplete="family-name" />
+            </div>
+            <div class="field">
+              <label for="email">E-mail</label>
+              <input id="email" v-model="customer.email" type="email" required autocomplete="email" />
+            </div>
+            <div class="field">
+              <label for="telephone">Téléphone</label>
+              <input id="telephone" v-model="customer.telephone" type="tel" autocomplete="tel" />
+            </div>
+            <div class="field field--full">
+              <label for="adresse">Adresse</label>
+              <input
+                id="adresse"
+                v-model="customer.adresse"
+                type="text"
+                required
+                autocomplete="address-line1"
+              />
+            </div>
+            <div class="field field--full">
+              <label for="complement">Complément d’adresse</label>
+              <input id="complement" v-model="customer.complement" type="text" autocomplete="address-line2" />
+            </div>
+            <div class="field">
+              <label for="codePostal">Code postal</label>
+              <input
+                id="codePostal"
+                v-model="customer.codePostal"
+                type="text"
+                required
+                autocomplete="postal-code"
+                inputmode="numeric"
+              />
+            </div>
+            <div class="field">
+              <label for="ville">Ville</label>
+              <input id="ville" v-model="customer.ville" type="text" required autocomplete="address-level2" />
+            </div>
+            <div class="field field--full">
+              <label for="pays">Pays</label>
+              <select id="pays" v-model="customer.pays" required autocomplete="country">
+                <option value="FR">France</option>
+                <option value="BE">Belgique</option>
+                <option value="CH">Suisse</option>
+                <option value="LU">Luxembourg</option>
+              </select>
+            </div>
+          </div>
+        </form>
       </div>
 
       <!-- RÉCAPITULATIF -->
@@ -134,7 +198,17 @@
           <span ref="totalEl">{{ formatPrice(grandTotal) }}</span>
         </p>
 
-        <button class="btn summary__cta" v-magnetic :disabled="state !== 'idle'" @click="checkout">
+        <!-- Rattaché au formulaire de livraison par son id, pas par imbrication
+             (il vit dans le récapitulatif, à droite) : le clic déclenche donc
+             la validation native du navigateur sur les champs requis avant
+             de lancer checkout() via @submit sur ce formulaire. -->
+        <button
+          class="btn summary__cta"
+          type="submit"
+          form="checkout-form"
+          v-magnetic
+          :disabled="state !== 'idle'"
+        >
           <span>{{ ctaLabel }}</span>
         </button>
 
@@ -169,9 +243,14 @@ import gsap from 'gsap'
 useHead({ title: 'Panier — Luméa' })
 
 const { detailed, count, total, setQty, remove, clear, restore } = useCart()
+const { customer, restore: restoreCustomer, persist: persistCustomer } = useCheckoutCustomer()
 const { $reduceMotion } = useNuxtApp()
 
 onMounted(restore)
+onMounted(restoreCustomer)
+// Enregistré à chaque frappe : un rechargement accidentel ne doit pas faire
+// tout retaper (même principe que le panier lui-même, voir useCart.ts).
+watch(customer, persistCustomer, { deep: true })
 
 // --- calculs de commande ----------------------------------------------------
 const BOTTLES_PER_PACK = 6
@@ -268,9 +347,43 @@ const ctaLabel = computed(() =>
   state.value === 'sending' ? 'Traitement…' : state.value === 'done' ? 'Merci !' : 'Commander'
 )
 
+// Le formulaire de livraison (voir plus haut) a déjà validé les champs requis
+// avant que cet appel ne parte (bouton type="submit" rattaché au formulaire
+// par son id). server/api/checkout.post.ts est pensé pour Stripe : tant
+// qu'aucune clé n'y est configurée, il renvoie une confirmation simulée
+// (`simulated: true`, sans `url`) et on continue sur la même animation de
+// confirmation locale qu'avant. Le jour où une vraie session Stripe est
+// créée côté serveur, `url` sera renseignée et on y redirige directement —
+// rien d'autre à changer ici.
 async function checkout() {
   if (state.value !== 'idle') return
   state.value = 'sending'
+
+  try {
+    const res = (await $fetch('/api/checkout', {
+      method: 'POST',
+      body: {
+        customer: customer.value,
+        lines: detailed.value.map((l: (typeof detailed.value)[number]) => ({
+          slug: l.slug,
+          name: l.drink.name,
+          qty: l.qty,
+          unitPrice: l.drink.price,
+          total: l.total
+        })),
+        amounts: { total: total.value, deposit: deposit.value, shipping: shipping.value, grandTotal: grandTotal.value }
+      }
+    })) as { ok: boolean; simulated: boolean; url: string | null }
+    if (res?.url) {
+      window.location.href = res.url
+      return
+    }
+  } catch {
+    // Coordonnées incomplètes ou panier vide (validées côté serveur) : on ne
+    // bloque pas la démo pour autant, la confirmation simulée reste jouée.
+    // Un vrai backend renverrait ici une erreur affichée près du formulaire.
+  }
+
   await new Promise((resolve) => setTimeout(resolve, 900))
   state.value = 'done'
   await nextTick()
@@ -419,6 +532,49 @@ function drawConfirmation() {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink-soft);
+}
+
+/* --- livraison -------------------------------------------------------------
+   Même trame que le récapitulatif d'à côté (.eyebrow, bordure du haut), mais
+   pas de fond ni de coins arrondis : c'est un formulaire, pas une carte. */
+.checkout-form {
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--line);
+}
+.checkout-form__grid {
+  margin-top: 1.4rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.4rem 1.6rem;
+}
+.checkout-form__grid .field--full {
+  grid-column: 1 / -1;
+}
+/* Un <select> a besoin d'un peu plus que .field input/textarea (règles
+   globales, assets/css/main.css) : la flèche native reste, mais la bordure et
+   la couleur de texte se calent sur le reste du formulaire. */
+.field select {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 0.8rem 0;
+  outline: none;
+  transition: border-color 0.35s var(--ease-soft);
+}
+.field select:focus {
+  border-color: var(--accent);
+}
+@media (max-width: 640px) {
+  .checkout-form__grid {
+    grid-template-columns: 1fr;
+  }
+  .checkout-form__grid .field--full {
+    grid-column: auto;
+  }
 }
 
 /* --- récapitulatif -------------------------------------------------------- */
