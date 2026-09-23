@@ -2,7 +2,7 @@
   <div>
     <div class="cart-scrim" :class="{ 'is-on': open }" @click="open = false" />
 
-    <aside class="cart" :class="{ 'is-on': open }" :aria-hidden="!open" aria-label="Panier">
+    <aside ref="cartEl" class="cart" :class="{ 'is-on': open }" :aria-hidden="!open" aria-label="Panier">
       <header class="cart__head">
         <p class="eyebrow">Panier ({{ count }})</p>
         <button class="cart__close" @click="open = false">Fermer</button>
@@ -61,6 +61,7 @@
 <script setup lang="ts">
 const { detailed, count, total, open, setQty, remove, clear, restore } = useCart()
 
+const cartEl = ref<HTMLElement | null>(null)
 const ordered = ref(false)
 
 // Le panier est relu une fois côté client, après l'hydratation.
@@ -79,7 +80,18 @@ function checkout() {
 
 // Le scroll de la page est bloqué tant que le tiroir est ouvert.
 watch(open, (isOpen) => {
-  if (import.meta.client) document.body.classList.toggle('nav-locked', isOpen)
+  if (!import.meta.client) return
+  document.body.classList.toggle('nav-locked', isOpen)
+
+  // Le focus ne doit jamais rester sur un lien/bouton qu'on masque (aria-hidden) :
+  // cliquer « Voir le panier » (NuxtLink) garde le focus dessus le temps que la
+  // navigation parte, pile au moment où `open` passe à false — Chrome bloque alors
+  // le aria-hidden et le signale en erreur console, à raison (un lecteur d'écran ne
+  // doit jamais perdre le focus sur du contenu qu'il ne peut plus annoncer).
+  if (!isOpen) {
+    const active = document.activeElement as HTMLElement | null
+    if (active && cartEl.value?.contains(active)) active.blur()
+  }
 })
 </script>
 

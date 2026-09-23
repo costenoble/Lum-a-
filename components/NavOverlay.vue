@@ -79,6 +79,16 @@ watch(navOpen, (open) => {
   if (import.meta.client) {
     document.body.classList.toggle('nav-locked', open)
     if ($lenis) open ? ($lenis as any).stop() : ($lenis as any).start()
+
+    // Le focus ne doit jamais rester sur un lien qu'on masque (aria-hidden) : en
+    // cliquant un lien du menu, ce lien garde le focus le temps que la navigation
+    // parte, pile au moment où navOpen passe à false — Chrome bloque alors le
+    // aria-hidden et le signale en erreur console, à raison (un lecteur d'écran ne
+    // doit jamais perdre le focus sur du contenu qu'il ne peut plus annoncer).
+    if (!open) {
+      const active = document.activeElement as HTMLElement | null
+      if (active && el.contains(active)) active.blur()
+    }
   }
 
   if ($reduceMotion) {
