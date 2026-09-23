@@ -26,6 +26,7 @@ import bananaVideo from '~/components/minimaxH3/bottle/web/fabrication-banana.mp
 import bananaPoster from '~/components/minimaxH3/bottle/web/fabrication-banana-poster.jpg'
 import watermelonVideo from '~/components/minimaxH3/bottle/web/fabrication-watermelon.mp4'
 import watermelonPoster from '~/components/minimaxH3/bottle/web/fabrication-watermelon-poster.jpg'
+import connectorVideo from '~/components/minimaxH3/bottle/web/fabrication-connector.mp4'
 
 const root = ref<HTMLElement | null>(null)
 let engine: { destroy: () => void } | null = null
@@ -72,7 +73,17 @@ onMounted(() => {
         tags: ['Verre consigné', 'Monomatière', '6 semaines'],
         cta: { primary: { label: 'Voir le savoir-faire', href: '/savoir-faire' } }
       }
-    ]
+    ],
+    // Sans connecteur, la coupure entre les deux bouteilles se sentait trop
+    // sèche (l'ambiance de fond flottait un instant, sans rien à regarder).
+    // Ce clip est un vrai fondu enchaîné, fabriqué à partir des vidéos
+    // existantes (dernière seconde de la banane, première de la pastèque,
+    // xfade ffmpeg) : la bouteille se change littéralement en l'autre, plutôt
+    // qu'un fondu enchaîné géométrique entre deux images sans rapport. Une
+    // demi-hauteur d'écran de scroll lui suffit : c'est une respiration, pas
+    // un troisième chapitre.
+    connScroll: 0.5,
+    connectors: [connectorVideo]
   })
 
   // Le moteur construit de simples <a href> (il ne connaît pas le routeur de

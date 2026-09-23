@@ -70,6 +70,14 @@ npm run generate # version 100 % statique
   [components/FabricationScene.vue](components/FabricationScene.vue) et
   [components/UniverseScene.vue](components/UniverseScene.vue) — même principe que `FooterSprint` plus
   haut : le fichier vit, la page ne l'appelle plus.
+  **Entre les deux bouteilles**, un connecteur (`connectors` dans la config du moteur — un chapitre
+  additionnel, sans texte, entre deux chapitres normaux) comble la coupure qui semblait trop sèche à
+  l'usage : `components/minimaxH3/bottle/web/fabrication-connector.mp4` est un vrai fondu enchaîné
+  (`ffmpeg xfade`, filtre `dissolve`) entre la dernière seconde de la vidéo banane et la première de la
+  vidéo pastèque — la bouteille se change littéralement en l'autre plutôt qu'un fondu géométrique entre
+  deux images sans rapport. Fabriqué à la main (pas par `scripts/bottle-video.py`, qui traite une seule
+  vidéo à la fois), donc pas de script à relancer si les deux vidéos changent — à refaire alors avec la
+  même commande `xfade`, voir l'historique Git de ce commit.
 - **Hero vidéo** ([components/HeroVideo.vue](components/HeroVideo.vue)) : au chargement, le rideau se
   lève sur une vidéo MiniMax H3 en plein écran, titre superposé. En défilant, le cadre rétrécit en une
   carte arrondie calée sur la colonne du site (un gabarit invisible mesure sa place exacte, donc elle
