@@ -46,12 +46,30 @@ npm run generate # version 100 % statique
 - **Curseur maison** ([components/CustomCursor.vue](components/CustomCursor.vue)) : point qui suit
   la souris et devient une pastille libellée au survol de tout élément portant
   `data-cursor="Voir"`. Inactif au tactile et en `prefers-reduced-motion`.
-- **Univers de la Source au scroll** ([components/FabricationScene.vue](components/FabricationScene.vue)) :
-  un bloc haut, un visuel collant, et la position de scroll qui donne un `progress` (0 → 1). Le
-  décor ([components/UniverseScene.vue](components/UniverseScene.vue)) est un SVG en couches — ciel,
-  îles flottantes, château, lac, cristal, cerisiers, prairie — dont chaque couche grossit à sa
-  vitesse depuis l'horizon : le parallaxe donne la profondeur, sans 3D ni vidéo. Direction
-  artistique tirée de l'illustration envoyée par le client, à remplacer par l'illustration finale.
+- **Vol scrollé sur /fabrication** ([components/FabricationFlight.vue](components/FabricationFlight.vue),
+  [assets/js/scroll-flight.js](assets/js/scroll-flight.js)) : deux orbites de bouteille (bouchon vu
+  d'en haut → profil → base), scrubées par le scroll comme `BottleScroll`, mais à plein écran et
+  chaînées l'une après l'autre, avec un texte épinglé par chapitre (éphémère : `overlayEnter` /
+  `overlayExit` par section) et une petite navigation à points sur le bord droit. Le moteur est une
+  adaptation du « scroll-world » fourni par le client
+  ([components/minimaxH3/bottle/lumea-scroll/site/](components/minimaxH3/bottle/lumea-scroll/site/)) :
+  vanilla JS, sans dépendance, il construit son propre DOM dans le conteneur qu'on lui donne. Deux
+  changements par rapport à l'original (voir l'en-tête du fichier) : il renvoie maintenant
+  `{ destroy() }` pour retirer proprement ses écouteurs `window` — l'original les gardait à vie, pensé
+  pour une page unique, alors que Luméa est une SPA où l'on peut quitter /fabrication puis y revenir
+  sans jamais recharger — et l'ancrage plein écran (`position: fixed`) est devenu un ancrage collant
+  (`position: sticky` dans un conteneur de la bonne hauteur, exactement le principe de `BottleScroll`) :
+  cette scène n'est qu'une section parmi d'autres sur la page, pas la page entière comme dans la démo
+  d'origine. Les deux vidéos viennent du même dossier que la bouteille Comète de l'accueil ; préparées
+  avec `scripts/bottle-video.py` (fond cuit à la couleur du site, filigrane retiré — chacune avait un
+  nombre d'images de filigrane différent, mesuré au cas par cas). Les deux flacons (banane, pastèque)
+  sont des essais MiniMax, pas des parfums du catalogue : le texte reste centré sur le geste de
+  fabrication (pressage, mise en bouteille), jamais sur le nom du fruit, pour ne pas laisser croire que
+  ce sont des parfums en vente. L'ancienne scène (« Univers de la Source », un SVG en couches parallaxe
+  tiré de l'illustration du client) reste dans le dépôt sans être appelée — voir
+  [components/FabricationScene.vue](components/FabricationScene.vue) et
+  [components/UniverseScene.vue](components/UniverseScene.vue) — même principe que `FooterSprint` plus
+  haut : le fichier vit, la page ne l'appelle plus.
 - **Hero vidéo** ([components/HeroVideo.vue](components/HeroVideo.vue)) : au chargement, le rideau se
   lève sur une vidéo MiniMax H3 en plein écran, titre superposé. En défilant, le cadre rétrécit en une
   carte arrondie calée sur la colonne du site (un gabarit invisible mesure sa place exacte, donc elle
@@ -269,10 +287,11 @@ La couche 3D est déclarative, en **TresJS** — l'équivalent Vue de react-thre
 | [components/BottleModel.vue](components/BottleModel.vue) | la bouteille, déclarée en `<TresMesh>` ; toute l'animation dérive d'une seule valeur, `progress` |
 | [components/BottleStage.vue](components/BottleStage.vue) | le décor : caméra, trois lumières, environnement |
 | [components/StudioEnvironment.vue](components/StudioEnvironment.vue) | `RoomEnvironment` passée au PMREM, sans HDRI distant |
-| [components/FabricationScene.vue](components/FabricationScene.vue) | le bloc collant et le ScrollTrigger qui pilote `progress` |
 
-Le hero et `/fabrication` partagent le même modèle : le premier fige `progress` à 1, la seconde
-le branche sur le scroll.
+Seul le hero (page d'accueil, [components/BottleCanvas.vue](components/BottleCanvas.vue)) affiche ce
+modèle aujourd'hui, `progress` figé à 1 : `/fabrication` n'y touche plus (voir plus haut, elle est
+passée au vol scrollé sur vidéo). Le commentaire de BottleCanvas.vue qui parle encore d'un « même
+modèle que la page fabrication » date de cette époque et n'a pas été corrigé.
 
 | Geste | Mécanique |
 | --- | --- |
