@@ -20,7 +20,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: 'fr' },
-      title: 'Luméa — Boissons lumineuses pour les petits',
+      title: 'Luméa — Boissons revigorantes pour les petits',
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         {

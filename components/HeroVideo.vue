@@ -22,7 +22,7 @@
         <div class="hv__overlay">
           <p class="hv__title" v-lines="0.1">
             <span class="line-mask"><span>Boissons</span></span>
-            <span class="line-mask"><span><em>lumineuses</em></span></span>
+            <span class="line-mask"><span><em>revigorantes</em></span></span>
             <span class="line-mask"><span>pour les petits</span></span>
           </p>
           <span class="hv__hint" v-reveal="0.6">Faites défiler <i /></span>

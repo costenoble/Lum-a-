@@ -9,7 +9,7 @@
 
       <h1 class="hero__title" v-lines="0.1" style="margin-top: 2rem">
         <span class="line-mask"><span>Boissons</span></span>
-        <span class="line-mask"><span><em>lumineuses</em></span></span>
+        <span class="line-mask"><span><em>revigorantes</em></span></span>
         <span class="line-mask"><span>pour les petits</span></span>
       </h1>
 
@@ -147,7 +147,7 @@
 import cometeVideo from '~/components/minimaxH3/bottle/web/comete.mp4'
 import cometePoster from '~/components/minimaxH3/bottle/web/comete-poster.jpg'
 
-useHead({ title: 'Luméa — Boissons lumineuses pour les petits' })
+useHead({ title: 'Luméa — Boissons revigorantes pour les petits' })
 
 const featured = computed(() => drinks.slice(0, 3))
 

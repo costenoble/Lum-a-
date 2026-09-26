@@ -4,7 +4,7 @@
 
     <div class="intro__content">
       <p class="intro__word line-mask"><span ref="wordEl">Luméa</span></p>
-      <p class="intro__baseline" ref="baselineEl">Boissons lumineuses pour les petits</p>
+      <p class="intro__baseline" ref="baselineEl">Boissons revigorantes pour les petits</p>
     </div>
 
     <p class="intro__count" ref="countEl">{{ initialCount }}</p>

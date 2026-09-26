@@ -5,7 +5,7 @@
 
 export const site = {
   name: 'Luméa',
-  baseline: 'Boissons lumineuses pour les petits',
+  baseline: 'Boissons revigorantes pour les petits',
   city: 'Lyon',
   since: 2024,
   email: 'bonjour@lumea.fr',

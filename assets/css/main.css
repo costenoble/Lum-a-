@@ -565,7 +565,9 @@ html.js [data-lines] .line-mask > span {
   padding-block: calc(var(--header-h) + 3rem) 2.5rem;
 }
 .hero__title {
-  font-size: var(--fs-hero);
+  /* « REVIGORANTES » fait ~6,9 em : sous 384 px de large, le plancher de --fs-hero
+     (3rem) le ferait déborder ; 12,5vw le garde dans la colonne. Sans effet au-delà. */
+  font-size: min(var(--fs-hero), 12.5vw);
   font-weight: 700;
   line-height: 0.86;
   letter-spacing: -0.05em;
