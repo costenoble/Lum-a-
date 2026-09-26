@@ -627,14 +627,17 @@ html.js [data-lines] .line-mask > span {
 /* =====================================================================
    MANIFESTE (texte revele mot a mot au scroll)
    ===================================================================== */
+/* Le manifeste est dans la police du texte courant (JetBrains Mono), pas dans celle des
+   titres : plus petit et plus posé, il se lit comme une phrase et non comme un slogan.
+   Une chasse fixe est plus large qu'une DynaPuff : la colonne passe à 34ch. */
 .manifesto p {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   overflow-wrap: break-word;
   font-weight: 500;
-  font-size: clamp(1.5rem, 3.4vw, 3rem);
-  line-height: 1.18;
-  letter-spacing: -0.03em;
-  max-width: 20ch;
+  font-size: clamp(1.05rem, 1.9vw, 1.6rem);
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  max-width: 34ch;
 }
 .manifesto .w {
   color: var(--line);
