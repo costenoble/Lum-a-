@@ -19,7 +19,7 @@ npm run generate # version 100 % statique
 | --- | --- |
 | `/` | Hero vidéo plein écran qui rétrécit en carte au défilement, puis hero titré, manifeste, bouteille qui tourne au scroll, carrousel des six parfums, 3 nouveautés, savoir-faire, chiffres, teaser studio |
 | `/boissons` | Grille filtrable par gamme |
-| `/fabrication` | Deux bouteilles qui tournent au scroll, texte à gauche (pressage, verre et bouchon), puis le détail de fabrication |
+| `/fabrication` | Frise « 48 heures » des six étapes (compteur d'heures au scroll), les refus barrés au scroll, une bouteille qui tourne, fiche technique |
 | `/coffret` | Composeur de coffret six bouteilles, partageable par URL |
 | `/boutique` | Packs, prix, ajout au panier (tiroir latéral) |
 | `/panier` | Page panier : lignes animées, récap, jauge de franco, confirmation |
@@ -43,26 +43,26 @@ npm run generate # version 100 % statique
 - **Curseur maison** ([components/CustomCursor.vue](components/CustomCursor.vue)) : point qui suit
   la souris et devient une pastille libellée au survol de tout élément portant
   `data-cursor="Voir"`. Inactif au tactile et en `prefers-reduced-motion`.
-- **Vol scrollé sur /fabrication** ([components/FabricationFlight.vue](components/FabricationFlight.vue)) :
-  deux `BottleScroll` chaînés l'un après l'autre dans le flux normal de la page — même composant, même
-  principe que la bouteille Comète de l'accueil (texte à gauche, bouteille à droite ; empilés sur
-  téléphone), juste utilisé deux fois avec un texte et une vidéo différents à chaque fois. Dès que le
-  premier bloc relâche son épinglage, le second prend la main directement : rien entre les deux, pas de
-  chapitre de transition. Les deux vidéos viennent du même dossier que Comète ; préparées avec
-  `scripts/bottle-video.py` (fond cuit à la couleur du site, filigrane retiré — chacune avait un nombre
-  d'images de filigrane différent, mesuré au cas par cas). Les deux flacons (banane, pastèque) sont des
-  essais MiniMax, pas des parfums du catalogue : le texte reste centré sur le geste de fabrication
-  (pressage, mise en bouteille), jamais sur le nom du fruit, pour ne pas laisser croire que ce sont des
-  parfums en vente.
-  **Essayé puis abandonné** : un moteur plein écran emprunté au client (« scroll-world », vidéo bord à
-  bord avec texte en surimpression, navigation à points, fondu enchaîné vidéo entre les deux bouteilles
-  — voir l'historique Git). Le rendu ne convainquait pas et la mise en page (texte flottant sur la vidéo,
-  pas de colonne dédiée) ne correspondait pas à celle du reste du site — retour à `BottleScroll`, qui
-  l'avait déjà résolue.
-  `BottleScroll` est devenu un composant à propriété à cette occasion (`src` / `poster` / `scroll`,
-  plus de vidéo Comète codée en dur) : la page d'accueil lui passe désormais les siennes explicitement.
-  Les anciennes versions de la page (« Univers de la Source » en SVG, couloir de fruits en 3D) ne
-  sont plus que dans l'historique Git.
+- **/fabrication en quatre temps** ([pages/fabrication.vue](pages/fabrication.vue)) :
+  - **Le chrono** ([components/FabricationChrono.vue](components/FabricationChrono.vue)) : six étapes,
+    du verger au carton (contenu : `fabricationSteps` dans [composables/useSite.ts](composables/useSite.ts)),
+    une carte par étape aux couleurs d'un parfum. Sur grand écran, la zone est haute et sa scène
+    collante (comme HeroVideo et BottleScroll) : le défilement fait glisser la piste de droite à
+    gauche, un compteur passe de 00 h à 48 h en suivant les heures des étapes, et les cartes qui
+    attendent leur tour restent en retrait. La hauteur de la zone vient de la longueur réelle de la
+    piste (`PACE` = pixels de scroll par pixel de glisse), recalculée à chaque `refreshInit` de
+    ScrollTrigger. Sous 900 px et en mouvement réduit (`gsap.matchMedia`), les cartes s'empilent.
+  - **Les refus** ([components/FabricationRefus.vue](components/FabricationRefus.vue)) : en section nuit,
+    ce qui n'entre jamais dans l'atelier (`refusals`, même fichier), en très gros ; chaque mot se fait
+    barrer au scroll pendant que sa raison s'allume. Sans JS ou en mouvement réduit, les mots sont
+    déjà barrés.
+  - **La bouteille** : un `BottleScroll` (même composant que Comète sur l'accueil), vidéo préparée par
+    `scripts/bottle-video.py`. Le flacon est un essai MiniMax, pas un parfum du catalogue : le texte
+    parle du contenant, jamais d'un fruit.
+  - **La fiche technique** et l'appel à composer un coffret.
+
+  Versions précédentes, dans l'historique Git seulement : « Univers de la Source » en SVG, couloir de
+  fruits en 3D, moteur plein écran « scroll-world », puis deux `BottleScroll` enchaînés.
 - **Hero vidéo** ([components/HeroVideo.vue](components/HeroVideo.vue)) : au chargement, le rideau se
   lève sur une vidéo MiniMax H3 en plein écran, titre superposé. En défilant, le cadre rétrécit en une
   carte arrondie calée sur la colonne du site (un gabarit invisible mesure sa place exacte, donc elle
@@ -109,8 +109,8 @@ npm run generate # version 100 % statique
   couleur du décodage vidéo (`DISPLAY_OFFSET`, mesuré dans Chrome : sans cela, la vidéo apparaîtrait de 2 à
   3 niveaux plus claire que la page). `BottleScroll` est un composant à propriété (`src`, `poster`,
   `scroll` — hauteurs d'écran de rotation, 3 par défaut) : ajouter un parfum, c'est lancer le script sur
-  sa vidéo, puis poser un nouveau `<BottleScroll :src :poster>` là où on le veut (voir `/fabrication`,
-  qui en chaîne deux). Les fichiers de travail
+  sa vidéo, puis poser un nouveau `<BottleScroll :src :poster>` là où on le veut (voir `/fabrication`).
+  Les fichiers de travail
   `components/minimaxH3/bottle/lumea-scroll/work/args_*.json` contiennent des liens signés : ne pas les
   versionner.
 - **Composeur de coffret** ([pages/coffret.vue](pages/coffret.vue)) : six casiers, la bouteille

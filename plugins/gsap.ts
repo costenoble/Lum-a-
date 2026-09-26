@@ -21,10 +21,13 @@ export default defineNuxtPlugin((nuxtApp) => {
     reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
     if (!reduceMotion) {
+      // Lissage par interpolation (lerp) plutôt que par durée : l'ancien réglage
+      // (duration 1,15 s, courbe exponentielle) faisait glisser la page plus d'une
+      // seconde après chaque cran de molette, ce qui se ressent comme du retard. À 0,12,
+      // la page suit le geste de près et garde juste ce qu'il faut de glisse.
       lenis = new Lenis({
-        duration: 1.15,
-        smoothWheel: true,
-        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+        lerp: 0.12,
+        smoothWheel: true
       })
       lenis.on('scroll', ScrollTrigger.update)
       gsap.ticker.add((time: number) => {
@@ -84,14 +87,15 @@ export default defineNuxtPlugin((nuxtApp) => {
       const inner = el.querySelectorAll<HTMLElement>('.line-mask > span')
       if (!inner.length) return el.removeAttribute('data-lines')
       const delay = typeof binding.value === 'number' ? binding.value : 0
-      // `y: 0` explicite : GSAP relit sinon le translateY(110%) posé par main.css comme un
+      // `y: 0` explicite : GSAP relit sinon le translateY(125%) posé par main.css comme un
       // décalage en pixels, qu'il garderait en plus de son yPercent (titre coincé en bas).
       if (reduceMotion) {
         gsap.set(inner, { y: 0, yPercent: 0, autoAlpha: 1 })
         el.removeAttribute('data-lines')
         return
       }
-      gsap.set(inner, { y: 0, yPercent: 110 })
+      // 125 % : le masque déborde de 0,14 em en bas (jambages), la ligne doit passer dessous.
+      gsap.set(inner, { y: 0, yPercent: 125 })
       el.removeAttribute('data-lines')
       afterIntro(el, () => {
         ;(el as any).__tween = gsap.to(inner, {

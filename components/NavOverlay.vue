@@ -1,5 +1,5 @@
 <template>
-  <div id="nav-overlay" class="nav-overlay" ref="root" :aria-hidden="!navOpen">
+  <div id="nav-overlay" class="nav-overlay" ref="root" :aria-hidden="!navOpen" data-lenis-prevent>
     <nav>
       <ul class="nav-overlay__list">
         <li v-for="item in nav" :key="item.to">

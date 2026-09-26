@@ -5,7 +5,9 @@ export default defineNuxtConfig({
   // faire dans un build de production.
   devtools: { enabled: import.meta.dev },
 
-  css: ['~/assets/css/main.css'],
+  // lenis.css : règles officielles de Lenis (html.lenis, blocage quand il est arrêté,
+  // zones `data-lenis-prevent` qui gardent leur propre défilement).
+  css: ['lenis/dist/lenis.css', '~/assets/css/main.css'],
 
   // Emplacement réservé pour Stripe (server/api/checkout.post.ts) : aucune clé
   // n'est configurée ici. Le jour venu, une variable d'environnement

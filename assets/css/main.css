@@ -366,6 +366,9 @@ main {
      masque vers le haut, sinon l'accent du É est coupé net. */
   padding-top: 0.14em;
   margin-top: -0.14em;
+  /* Même chose en bas pour les jambages (le « g » de DynaPuff descend loin). */
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
 }
 .line-mask > span {
   display: block;
@@ -381,7 +384,7 @@ html.js [data-reveal] {
   animation: reveal-failsafe 0s 5s forwards;
 }
 html.js [data-lines] .line-mask > span {
-  transform: translateY(110%);
+  transform: translateY(125%);
   animation: reveal-failsafe 0s 5s forwards;
 }
 @keyframes reveal-failsafe {
@@ -819,7 +822,9 @@ html.js [data-lines] .line-mask > span {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink-soft);
-  margin-top: 0.6rem;
+  /* De l'air sous le chiffre : DynaPuff a des jambages profonds (le « g » de « 0 g »)
+     qui venaient presque toucher le libellé. */
+  margin-top: clamp(1.1rem, 1.8vw, 1.6rem);
 }
 .night .stat__label {
   color: var(--on-night-soft);

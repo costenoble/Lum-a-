@@ -283,6 +283,64 @@ export const stats = [
   { value: 100, suffix: ' %', label: 'Verre consigné' }
 ]
 
+// Page /fabrication : les étapes du « chrono », du verger au carton. `hour` est l'heure
+// écoulée depuis l'arrivée des fruits (le compteur de la page s'y cale) ; `drink` prête
+// sa couleur et sa photo à la carte de l'étape.
+export const fabricationSteps = [
+  {
+    hour: 0,
+    title: 'Cueillir',
+    headline: 'Le chrono démarre au verger',
+    text: 'Des fruits cueillis mûrs, chez des producteurs à moins de 200 km de Lyon : Drôme, Ardèche, monts du Lyonnais. Ils arrivent quai Rambaud le matin même, ni calibrés ni stockés.',
+    drink: 'prairie'
+  },
+  {
+    hour: 6,
+    title: 'Presser',
+    headline: 'À froid, jamais sous la flamme',
+    text: 'Lavés, triés à la main, puis pressés à froid. Rien n’est chauffé, rien n’est ajouté : ce qui sort de la presse est exactement ce qui ira dans la bouteille.',
+    drink: 'comete'
+  },
+  {
+    hour: 8,
+    title: 'Remplir',
+    headline: 'Du pressoir au verre, sans détour',
+    text: 'Le jus passe directement en bouteille de verre, remplie à 4 °C. Pas de cuve de stockage, pas de concentré à reconstituer plus tard.',
+    drink: 'aurore'
+  },
+  {
+    hour: 10,
+    title: 'Sceller',
+    headline: 'Une étiquette, un bouchon, un numéro',
+    text: 'L’étiquette est monomatière, pour que le verre se lave sans laisser de colle. Le bouchon scelle la bouteille, et chaque lot reçoit son numéro.',
+    drink: 'solaire'
+  },
+  {
+    hour: 24,
+    title: 'Reposer',
+    headline: 'Une nuit au frais, un lot goûté',
+    text: 'Les bouteilles passent la nuit en chambre froide. Chaque lot est goûté et analysé avant de partir : s’il n’est pas bon, il ne part pas.',
+    drink: 'nuage'
+  },
+  {
+    hour: 48,
+    title: 'Livrer',
+    headline: 'En rayon, deux jours plus tard',
+    text: 'Expédiées au frais vers nos 240 points de vente. Elles se gardent six semaines — et le verre, une fois bu, revient chez nous.',
+    drink: 'lagon'
+  }
+]
+
+// Page /fabrication : ce qui n'entre jamais dans l'atelier, barré au scroll.
+export const refusals = [
+  { word: 'Sucre ajouté', why: 'Un fruit mûr en a déjà assez.' },
+  { word: 'Colorant', why: 'La couleur, c’est le fruit qui la donne.' },
+  { word: 'Arôme', why: 'Si ça sent la fraise, c’est qu’il y a de la fraise.' },
+  { word: 'Concentré', why: 'Pressé le jour même, jamais reconstitué.' },
+  { word: 'Pasteurisation', why: 'À 90 °C, elle allonge la date et aplatit le goût.' },
+  { word: 'Bouteille jetable', why: 'Le verre revient, on le relave, il repart.' }
+]
+
 export function useDrink(slug: string) {
   return drinks.find((d) => d.slug === slug) ?? null
 }

@@ -60,14 +60,18 @@ const pageTransition = {
       done()
       return
     }
-    // Rideau volontairement court (≈ 1 s aller-retour) : il rythme la navigation
-    // sans la faire attendre.
+    // ≈ 1,4 s aller-retour. Pas plus court, et pas en power4.in : les bandes y
+    // restaient presque invisibles jusqu'au dernier instant, puis repartaient aussitôt
+    // — on ne voyait plus qu'un éclair noir, plus une transition.
+    // `overwrite` : un second clic pendant la transition reprend les bandes où elles
+    // sont, au lieu de faire tourner deux tweens l'un contre l'autre.
     gsap.to(overlayEl.value.querySelectorAll('span'), {
       scaleY: 1,
       transformOrigin: 'bottom',
-      duration: 0.4,
-      ease: 'power4.in',
-      stagger: 0.05,
+      duration: 0.5,
+      ease: 'power3.inOut',
+      stagger: 0.06,
+      overwrite: true,
       onComplete: () => {
         resetScroll()
         done()
@@ -82,9 +86,12 @@ const pageTransition = {
     gsap.to(overlayEl.value.querySelectorAll('span'), {
       scaleY: 0,
       transformOrigin: 'top',
-      duration: 0.5,
-      ease: 'power4.out',
-      stagger: 0.05,
+      duration: 0.6,
+      ease: 'power3.inOut',
+      stagger: 0.06,
+      // Un temps d'arrêt sur l'écran couvert : c'est lui qui fait lire le rideau.
+      delay: 0.1,
+      overwrite: true,
       onComplete: () => {
         ScrollTrigger.refresh()
         done()

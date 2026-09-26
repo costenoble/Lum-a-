@@ -4,7 +4,14 @@
 
     <!-- Fermé, le tiroir est `inert` : ni le clavier ni un lecteur d'écran ne peuvent
          y entrer, alors qu'il est seulement poussé hors de l'écran. -->
-    <aside ref="cartEl" class="cart" :class="{ 'is-on': open }" :inert="!open" aria-label="Panier">
+    <aside
+      ref="cartEl"
+      class="cart"
+      :class="{ 'is-on': open }"
+      :inert="!open"
+      aria-label="Panier"
+      data-lenis-prevent
+    >
       <header class="cart__head">
         <p class="eyebrow">Panier ({{ count }})</p>
         <button ref="closeEl" class="cart__close" @click="open = false">Fermer</button>
@@ -62,6 +69,7 @@
 
 <script setup lang="ts">
 const { detailed, count, total, open, setQty, remove, clear, restore } = useCart()
+const { $lenis } = useNuxtApp()
 
 const cartEl = ref<HTMLElement | null>(null)
 const closeEl = ref<HTMLElement | null>(null)
@@ -97,6 +105,8 @@ function checkout() {
 watch(open, (isOpen) => {
   if (!import.meta.client) return
   document.body.classList.toggle('nav-locked', isOpen)
+  // `overflow: hidden` ne suffit pas : Lenis ferait quand même défiler la page derrière.
+  if ($lenis) isOpen ? ($lenis as any).stop() : ($lenis as any).start()
 
   // À l'ouverture, le focus entre dans le tiroir ; à la fermeture, il retourne d'où il
   // venait. Il ne doit jamais rester sur un lien/bouton qu'on rend inerte : cliquer
