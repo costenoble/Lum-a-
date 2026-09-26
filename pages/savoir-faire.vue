@@ -3,12 +3,12 @@
     <section class="container page-head">
       <p class="eyebrow" v-reveal>Savoir-faire</p>
       <h1 v-lines="0.05" style="font-size: var(--fs-hero); margin-top: 1.5rem">
-        <span class="line-mask"><span>De la recette</span></span>
-        <span class="line-mask"><span>au <em>render</em></span></span>
+        <span class="line-mask"><span>Que du</span></span>
+        <span class="line-mask"><span><em>fruit</em></span></span>
       </h1>
       <p class="lead" v-reveal="0.4" style="margin-top: 2rem">
-        Cinq métiers dans une même pièce. C’est la raison pour laquelle une bouteille Luméa
-        ressemble à ce qu’elle a le goût d’être.
+        Pas de sucre ajouté, pas d’arôme, pas de colorant : une bouteille Luméa, c’est un fruit
+        pressé qu’on a mis au frais. Voilà ce que ça change.
       </p>
     </section>
 
@@ -28,30 +28,40 @@
       </div>
     </section>
 
-    <MarqueeBand :items="['Recette', 'Direction artistique', 'Packaging', 'Image 3D']" :speed="24" />
+    <MarqueeBand :items="['Que du fruit', 'Pressé à froid', 'Zéro sucre ajouté', 'Bien frais']" :speed="24" />
 
     <section class="section container">
       <div class="section-head">
-        <h2 style="font-size: var(--fs-h1)">Les rendus 3D</h2>
+        <h2 style="font-size: var(--fs-h1)">Six fruits, six bouteilles</h2>
         <p class="muted" style="max-width: 40ch">
-          Chaque parfum est modélisé sous Blender avant d’être produit : étiquette, condensation,
-          verre teinté. Les images ci-dessous sont les emplacements attendus dans
-          <code>/public/renders/</code>.
+          Mangue, fraise, pomme, myrtille, pêche… Chaque parfum part d’un fruit (parfois deux),
+          et de rien d’autre.
         </p>
       </div>
 
       <div class="projects-grid">
-        <div v-for="drink in drinks" :key="drink.slug" class="reveal-mask" v-reveal>
-          <BottleShot
-            :label="drink.name"
-            :src="drink.render"
-            :color="drink.color"
-            :color2="drink.color2"
-            ratio="1x1"
-            :alt="`Render 3D ${drink.name}`"
-            :filter="drink.renderFilter"
-          />
-        </div>
+        <NuxtLink
+          v-for="drink in drinks"
+          :key="drink.slug"
+          :to="`/boissons/${drink.slug}`"
+          class="fruit-card"
+          data-cursor="Voir"
+          v-reveal
+        >
+          <div class="reveal-mask">
+            <BottleShot
+              :label="drink.name"
+              :src="drink.render"
+              :color="drink.color"
+              :color2="drink.color2"
+              ratio="1x1"
+              :alt="`Bouteille Luméa ${drink.name}`"
+              :filter="drink.renderFilter"
+            />
+          </div>
+          <p class="fruit-card__name">{{ drink.name }}</p>
+          <p class="muted fruit-card__fruit">{{ drink.fruit }}</p>
+        </NuxtLink>
       </div>
     </section>
   </div>
@@ -62,20 +72,20 @@ useHead({ title: 'Savoir-faire — Luméa' })
 
 const method = [
   {
-    title: 'Goûter',
-    desc: 'Un panel de vingt enfants teste chaque piste à l’aveugle. Aucune recette ne sort sans leur accord.'
+    title: 'Choisir',
+    desc: 'Des fruits mûrs et de saison, cueillis à moins de 200 km. Un fruit qui a mûri au soleil n’a besoin de rien d’autre.'
   },
   {
     title: 'Presser',
-    desc: 'Pressage à froid dans un rayon de 200 km, mise en bouteille sous 48 h.'
+    desc: 'À froid, sans chauffer ni rien ajouter. Mise en bouteille dans les 48 heures.'
   },
   {
-    title: 'Dessiner',
-    desc: 'Une étiquette par parfum, une seule typographie, une couleur qui vient du fruit lui-même.'
+    title: 'Goûter',
+    desc: 'Un panel d’enfants goûte chaque recette à l’aveugle. Aucune ne sort sans leur accord.'
   },
   {
-    title: 'Rendre',
-    desc: 'Modélisation et éclairage sous Blender : la photo produit existe avant le produit.'
+    title: 'Savourer',
+    desc: 'Bien frais, au goûter, au pique-nique ou au retour de l’école. Et la bouteille revient.'
   }
 ]
 </script>
@@ -107,8 +117,17 @@ const method = [
   font-size: 1.6rem;
   margin-block: 1rem 0.8rem;
 }
-code {
-  font-family: var(--font-mono);
-  font-size: 0.85em;
+.fruit-card {
+  display: grid;
+  gap: 0.35rem;
+}
+.fruit-card__name {
+  margin-top: 0.9rem;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+.fruit-card__fruit {
+  font-size: 0.9rem;
 }
 </style>

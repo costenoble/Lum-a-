@@ -230,41 +230,43 @@ export const drinks: Drink[] = [
 
 export const ranges = ['Jus pressé', 'Pétillant doux', 'Infusion froide', 'Lait végétal'] as const
 
+// Ce qu'une bouteille Luméa apporte (bloc « Bien-être » de l'accueil et de
+// /savoir-faire). `image` : vignette qui suit le curseur au survol, teintée par `color`.
 export const expertises = [
   {
     idx: '01',
-    title: 'Recette',
-    desc: 'Formulation sans sucres ajoutés, validée par un panel de goûteurs de 3 à 10 ans.',
+    title: 'Que du fruit',
+    desc: 'Des fruits pressés, un peu d’eau de source, parfois une fleur ou une plante. Rien d’autre dans la bouteille.',
     color: '#ff8a3d',
     image: '/expertise/recette.webp'
   },
   {
     idx: '02',
-    title: 'Direction artistique',
-    desc: 'Un univers graphique qui parle aux enfants sans infantiliser les parents.',
-    color: '#ff4f79',
-    image: '/expertise/direction-artistique.webp'
+    title: 'Zéro sucre ajouté',
+    desc: 'La douceur vient du fruit mûr, pas d’une cuillère de sucre. Rien à compenser, rien à cacher.',
+    color: '#ffb03d',
+    image: '/renders/aurore-640.webp'
   },
   {
     idx: '03',
-    title: 'Packaging',
-    desc: 'Verre consigné, étiquette monomatière, format pensé pour une main de cinq ans.',
+    title: 'Pressé à froid',
+    desc: 'Jamais chauffé : le fruit garde son goût, sa couleur et ce qu’il a de meilleur, vitamines comprises.',
     color: '#4fbf7a',
-    image: '/expertise/packaging.webp'
+    image: '/renders/prairie-640.webp'
   },
   {
     idx: '04',
-    title: 'Image 3D',
-    desc: 'Chaque bouteille est modélisée et rendue sous Blender avant d’exister en verre.',
+    title: 'La juste dose',
+    desc: '20 cl, la bonne portion pour un goûter : de quoi se désaltérer sans couper l’appétit du dîner.',
     color: '#7b6cf6',
-    image: '/renders/solaire-640.webp'
+    image: '/expertise/packaging.webp'
   },
   {
     idx: '05',
-    title: 'Retail & digital',
-    desc: 'Du linéaire épicerie fine au site marchand, une seule et même grammaire visuelle.',
-    color: '#2fc4c0',
-    image: '/expertise/retail-digital.webp'
+    title: 'Un goûter qui fait du bien',
+    desc: 'Une boisson qu’on boit pour le plaisir, et que les parents servent l’esprit tranquille.',
+    color: '#ff4f79',
+    image: '/renders/comete-640.webp'
   }
 ]
 
@@ -276,11 +278,12 @@ export const awards = [
   { name: 'Awwwards', category: 'Site of the Day', year: 2026 }
 ]
 
+// Chaque chiffre prend la couleur d'un parfum (Solaire, Comète, Prairie, Nuage).
 export const stats = [
-  { value: 6, suffix: '', label: 'Parfums au catalogue' },
-  { value: 0, suffix: ' g', label: 'Sucres ajoutés' },
-  { value: 240, suffix: '', label: 'Points de vente' },
-  { value: 100, suffix: ' %', label: 'Verre consigné' }
+  { value: 6, suffix: '', label: 'Parfums au catalogue', color: '#ff8a3d' },
+  { value: 0, suffix: ' g', label: 'Sucres ajoutés', color: '#ff4f79' },
+  { value: 240, suffix: '', label: 'Points de vente', color: '#4fbf7a' },
+  { value: 100, suffix: ' %', label: 'Verre consigné', color: '#7b6cf6' }
 ]
 
 // Page /fabrication : les étapes du « chrono », du verger au carton. `hour` est l'heure

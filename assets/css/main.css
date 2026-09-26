@@ -812,6 +812,8 @@ html.js [data-lines] .line-mask > span {
   gap: var(--sp-3);
 }
 .stat__num {
+  /* --stat-c : couleur propre à un chiffre (StatCounter), sinon celle du texte. */
+  color: var(--stat-c, inherit);
   font-family: var(--font-display);
   font-weight: 700;
   font-size: clamp(3rem, 8vw, 6.5rem);

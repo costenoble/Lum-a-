@@ -11,11 +11,10 @@
       :style="imgStyle"
     />
 
-    <!-- Emplacement render : dégradé signature du parfum + halo + initiale.
-         Dès que le PNG Blender existe, on passe `src` et la boîte ne bouge pas. -->
+    <!-- Sans image : dégradé signature du parfum + halo + initiale. Dès qu'une photo
+         existe, on passe `src` et la boîte ne bouge pas. -->
     <div v-else class="ph" :style="phStyle" role="img" :aria-label="alt">
       <span class="ph__letter">{{ label.slice(0, 1) }}</span>
-      <span class="ph__tag">render&nbsp;3D</span>
     </div>
   </figure>
 </template>
@@ -96,15 +95,5 @@ const phStyle = computed(() => ({
   letter-spacing: -0.06em;
   color: rgba(255, 255, 255, 0.9);
   mix-blend-mode: soft-light;
-}
-.ph__tag {
-  position: absolute;
-  left: 1rem;
-  bottom: 1rem;
-  font-family: var(--font-mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.72);
 }
 </style>

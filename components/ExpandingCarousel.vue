@@ -184,11 +184,6 @@ function onHover(index: number) {
      laisse un vide à droite. */
   aspect-ratio: auto;
 }
-/* La mention « render 3D » du placeholder n'a pas sa place ici : sur une
-   slide réduite elle chevauche le nom vertical. */
-.xc :deep(.ph__tag) {
-  display: none;
-}
 .xc__pick {
   position: absolute;
   inset: 0;

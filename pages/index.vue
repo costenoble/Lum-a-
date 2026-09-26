@@ -33,17 +33,19 @@
 
     <!-- MANIFESTE, épinglé sur la bouteille qui tourne : le texte s'encre mot à mot au rythme
          de la rotation (la vidéo suit le scroll), et le lien apparaît à la fin. -->
-    <BottleScroll :src="cometeVideo" :poster="cometePoster" v-slot="{ progress }">
+    <!-- Sur téléphone (`stacked`), le texte passe après la bouteille : il s'encre alors
+         à son propre rythme de scroll au lieu de suivre la rotation. -->
+    <BottleScroll :src="cometeVideo" :poster="cometePoster" v-slot="{ progress, stacked }">
       <div class="container manifesto-wrap">
         <p class="eyebrow" v-reveal>La marque</p>
         <ManifestoText
-          :progress="inkProgress(progress)"
+          :progress="stacked ? undefined : inkProgress(progress)"
           text="Luméa fabrique des boissons que les enfants réclament et que les parents acceptent. Pas de sucre ajouté, pas de colorant, pas de personnage sous licence. Juste du fruit, du verre, et une lumière qu’on a mis deux ans à trouver."
         />
         <NuxtLink
           to="/studio"
           class="btn btn--ghost manifesto-cta"
-          :class="{ 'is-on': progress > 0.86 }"
+          :class="{ 'is-on': stacked || progress > 0.86 }"
           v-magnetic
         >
           <span>Découvrir le studio</span>
@@ -81,9 +83,9 @@
     <section class="night section">
       <div class="container">
         <div class="section-head">
-          <p class="eyebrow">Savoir-faire</p>
+          <p class="eyebrow">Bien-être</p>
           <p class="lead" style="max-width: 34ch">
-            De la recette au render 3D, tout se décide dans le même atelier.
+            Que du fruit, et tout ce qu’il a de bon. Le reste, on le laisse dehors.
           </p>
         </div>
         <ExpertiseList />
@@ -99,6 +101,7 @@
           :value="s.value"
           :suffix="s.suffix"
           :label="s.label"
+          :color="s.color"
         />
       </div>
 
@@ -117,9 +120,8 @@
         <div v-parallax="14">
           <BottleShot
             label="Atelier"
-            alt="L’atelier Luméa"
-            color="#2fc4c0"
-            color2="#ffd166"
+            src="/expertise/packaging-1200.webp"
+            alt="Bouteilles étiquetées à la main dans l’atelier Luméa"
             ratio="4x5"
           />
         </div>
@@ -128,12 +130,12 @@
       <div class="studio-teaser__text">
         <p class="eyebrow" v-reveal>L’atelier</p>
         <h2 v-reveal="0.05" style="font-size: var(--fs-h1); margin-block: 1.5rem">
-          Onze personnes, un pressoir, une salle de rendu.
+          Onze personnes, un pressoir, beaucoup de fruits.
         </h2>
         <p class="muted" v-reveal="0.1">
-          Luméa est né en 2024 à la Croix-Rousse, entre un atelier de jus et un studio d’image.
-          On formule, on dessine, on modélise et on photographie tout au même endroit — c’est ce
-          qui donne à la gamme son air de famille.
+          Luméa est né en 2024 à la Croix-Rousse, dans un petit atelier de jus. On choisit les
+          fruits, on presse, on goûte et on met en bouteille au même endroit — c’est ce qui donne
+          à chaque parfum son goût de fait maison.
         </p>
         <NuxtLink to="/studio" class="btn" v-magnetic v-reveal="0.15" style="margin-top: 2rem">
           <span>Notre histoire</span>

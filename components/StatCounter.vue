@@ -1,5 +1,5 @@
 <template>
-  <div class="stat" ref="root">
+  <div class="stat" ref="root" :style="color ? { '--stat-c': color } : undefined">
     <p class="stat__num">{{ shown }}{{ suffix }}</p>
     <p class="stat__label">{{ label }}</p>
   </div>
@@ -9,9 +9,10 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-const props = withDefaults(defineProps<{ value: number; label: string; suffix?: string }>(), {
-  suffix: ''
-})
+const props = withDefaults(
+  defineProps<{ value: number; label: string; suffix?: string; /** Couleur du chiffre. */ color?: string }>(),
+  { suffix: '', color: '' }
+)
 
 const root = ref<HTMLElement | null>(null)
 const shown = ref(props.value)

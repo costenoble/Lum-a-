@@ -2,9 +2,11 @@
   <section
     ref="root"
     class="bs"
-    :class="{ 'bs--static': fixed, 'bs--copy': !!$slots.default }"
+    :class="{ 'bs--static': fixed, 'bs--copy': !!$slots.default, 'bs--stacked': stacked }"
     :style="{ '--bs-scroll': scroll }"
   >
+    <!-- La zone porte la hauteur de défilement ; la scène y reste collée. -->
+    <div ref="zone" class="bs__zone">
     <div class="bs__stage">
       <!-- Jamais lue : sa position dans le temps suit le scroll. Le fond de la vidéo est
            celui du site (cuit à la fabrication, cf. scripts/bottle-video.py) : elle n'a
@@ -22,9 +24,17 @@
 
       <!-- Le texte, s'il y en a un, est épinglé avec la bouteille : il reçoit l'avancement
            (0 → 1) pour se caler sur la rotation. -->
-      <div v-if="$slots.default" class="bs__copy">
-        <slot :progress="progress" />
+      <div v-if="$slots.default && !stacked" class="bs__copy">
+        <slot :progress="progress" :stacked="false" />
       </div>
+    </div>
+    </div>
+
+    <!-- Téléphone : pas la place de montrer bouteille et texte ensemble. La bouteille a
+         l'écran pour elle pendant sa rotation, le texte vient juste après, dans le flux
+         normal (l'appelant sait par `stacked` qu'il ne suit plus la rotation). -->
+    <div v-if="$slots.default && stacked" class="bs__after">
+      <slot :progress="progress" :stacked="true" />
     </div>
   </section>
 </template>
@@ -80,7 +90,17 @@ const TAU = 67
 const { $reduceMotion } = useNuxtApp()
 
 const root = ref<HTMLElement | null>(null)
+const zone = ref<HTMLElement | null>(null)
 const video = ref<HTMLVideoElement | null>(null)
+
+/** Téléphone : le texte passe après la bouteille au lieu d'être posé dessus. */
+const stacked = ref(false)
+let narrow: MediaQueryList | null = null
+const onNarrow = () => {
+  stacked.value = !!narrow?.matches
+  // Le texte change de place, donc la page change de hauteur.
+  nextTick(() => ScrollTrigger.refresh())
+}
 
 /** Avancement de la rotation, 0 → 1 : le texte de l'emplacement s'y cale. */
 const progress = ref(0)
@@ -95,13 +115,17 @@ let objectUrl = ''
 
 onMounted(() => {
   const v = video.value
-  if (!v || !root.value) return
+  if (!v || !zone.value) return
 
   if ($reduceMotion) {
     fixed.value = true
     progress.value = 1 // tout le texte est lisible, tout de suite
     return
   }
+
+  narrow = window.matchMedia('(max-width: 899px)')
+  stacked.value = narrow.matches
+  narrow.addEventListener('change', onNarrow)
 
   // --- chargement ---
   let started = false
@@ -139,7 +163,7 @@ onMounted(() => {
   }
 
   trigger = ScrollTrigger.create({
-    trigger: root.value,
+    trigger: zone.value,
     start: 'top top',
     end: 'bottom bottom',
     onUpdate: (self) => {
@@ -164,10 +188,11 @@ onMounted(() => {
     },
     { rootMargin: '150% 0px' }
   )
-  observer.observe(root.value)
+  observer.observe(zone.value)
 })
 
 onUnmounted(() => {
+  narrow?.removeEventListener('change', onNarrow)
   cancelAnimationFrame(raf)
   observer?.disconnect()
   trigger?.kill()
@@ -180,6 +205,9 @@ onUnmounted(() => {
    scène lui-même. */
 .bs {
   --bs-scroll: 3;
+  position: relative;
+}
+.bs__zone {
   position: relative;
   height: calc(100svh * (1 + var(--bs-scroll)));
 }
@@ -228,22 +256,34 @@ onUnmounted(() => {
   }
 }
 
-/* Téléphone : pas la place de mettre le texte à côté. Il se pose en bas, sur un voile de
-   la couleur du fond, et la vidéo remonte pour que la bouteille reste au-dessus. */
-@media (max-width: 899px) {
-  .bs--copy .bs__video {
-    translate: 0 -17svh;
-  }
-  .bs__copy {
-    top: auto;
-    align-items: flex-end;
-    padding: 9rem 0 1.75rem;
-    background: linear-gradient(to top, var(--paper) 68%, rgba(243, 242, 239, 0));
-  }
+/* --- téléphone : la bouteille seule, puis le texte -------------------------------------
+   En plein écran portrait, une vidéo paysage en `cover` n'en montrait qu'un gros tiers :
+   la bouteille sortait du cadre et les gros plans devenaient un mur rouge. Ici la vidéo
+   garde son format (16:9), à ~2/3 de la hauteur d'écran, centrée sous le header ; elle
+   déborde sur les côtés, ce qui ne se voit pas puisque son fond est celui du site. La
+   rotation est un peu plus courte, le texte arrive juste après (.bs__after). */
+.bs--stacked .bs__zone {
+  height: calc(100svh * (1 + var(--bs-scroll) * 0.7));
+}
+.bs--stacked .bs__video {
+  inset: auto;
+  top: calc(50% + var(--header-h) / 2);
+  left: 50%;
+  width: auto;
+  height: min(66svh, 150vw);
+  aspect-ratio: 16 / 9;
+  translate: -50% -50%;
+  /* Les gros plans touchent le haut et le bas de l'image : sans fondu, le bord du cadre
+     se lit comme une bande nette sur le fond de la page. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
+}
+.bs__after {
+  padding-block: var(--sp-3) var(--sp-5);
 }
 
 /* --- mouvement réduit : une image fixe, sans zone collante ---------------------- */
-.bs--static {
+.bs--static .bs__zone {
   height: auto;
 }
 .bs--static .bs__stage {

@@ -7,8 +7,8 @@
         <span class="line-mask"><span>personnes</span></span>
       </h1>
       <p class="lead" v-reveal="0.4" style="margin-top: 2rem">
-        Un pressoir, une table à dessin, une salle de rendu. Luméa fabrique ses boissons et
-        ses images au même endroit, à {{ site.city }}.
+        Un pressoir, une chambre froide et une grande table pour goûter. Luméa fabrique toutes
+        ses boissons au même endroit, à {{ site.city }}.
       </p>
     </section>
 
@@ -16,12 +16,22 @@
       <div class="case-body">
         <div class="col-6 reveal-mask" v-reveal>
           <div v-parallax="12" class="parallax-pad">
-            <BottleShot label="Atelier" alt="L’atelier" color="#ffb03d" color2="#ff8a3d" ratio="4x5" />
+            <BottleShot
+              label="Atelier"
+              src="/expertise/recette-1200.webp"
+              alt="Fruits frais sur la table de l’atelier"
+              ratio="4x5"
+            />
           </div>
         </div>
         <div class="col-6 reveal-mask" v-reveal="0.1" style="align-self: end">
           <div v-parallax="-10" class="parallax-pad">
-            <BottleShot label="Équipe" alt="L’équipe" color="#7b6cf6" color2="#c3b5ff" ratio="1x1" />
+            <BottleShot
+              label="Bouteilles"
+              src="/expertise/packaging-1200.webp"
+              alt="Bouteilles de l’atelier, étiquetées à la main"
+              ratio="1x1"
+            />
           </div>
         </div>
       </div>
@@ -77,14 +87,14 @@ const values = [
   },
   {
     title: 'Tout faire ici',
-    desc: 'Recette, design, 3D, site : la même équipe, le même bâtiment, le même goût.'
+    desc: 'Choisir les fruits, presser, goûter, mettre en bouteille : la même équipe, le même bâtiment, le même goût.'
   }
 ]
 
 const timeline = [
   { year: '2024', text: 'Premières 400 bouteilles d’Aurore, produites à la Croix-Rousse.' },
   { year: '2025', text: 'Ouverture de l’atelier quai Rambaud, arrivée des gammes pétillantes.' },
-  { year: '2026', text: 'Six parfums, 240 points de vente, un studio 3D intégré.' }
+  { year: '2026', text: 'Six parfums, 240 points de vente, et toujours zéro sucre ajouté.' }
 ]
 </script>
 

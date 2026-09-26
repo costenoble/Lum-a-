@@ -9,8 +9,14 @@
       <ul ref="list" class="refus__list">
         <li v-for="r in refusals" :key="r.word" class="refus__row">
           <span class="refus__word">
-            {{ r.word }}
-            <i class="refus__strike" aria-hidden="true" />
+            <!-- Le mot entier pour les lecteurs d'écran, les lettres pour l'animation. -->
+            <span class="refus__sr">{{ r.word }}</span>
+            <span
+              v-for="(char, k) in [...r.word]"
+              :key="k"
+              class="refus__char"
+              aria-hidden="true"
+            >{{ char }}</span>
           </span>
           <span class="refus__why">{{ r.why }}</span>
         </li>
@@ -23,12 +29,12 @@
 import gsap from 'gsap'
 
 // ---------------------------------------------------------------------------
-// La liste de ce que Luméa refuse, en très gros : chaque mot se fait barrer à
-// mesure qu'il monte dans l'écran (scrub), et s'efface derrière son trait pendant
-// que sa raison s'allume à côté.
+// La liste de ce que Luméa refuse, en très gros : à mesure qu'un mot monte dans
+// l'écran, il se dissout lettre par lettre (fondu, léger flou, de gauche à droite)
+// pendant que sa raison apparaît à côté. Tout est lié au scroll (scrub) : en
+// remontant, le mot se reforme.
 //
-// Sans JS ou en mouvement réduit, les mots sont déjà barrés : le trait est l'état
-// par défaut en CSS, l'animation ne fait que le rejouer.
+// Sans JS ou en mouvement réduit, les mots restent simplement lisibles.
 // ---------------------------------------------------------------------------
 
 const { $reduceMotion } = useNuxtApp()
@@ -42,17 +48,22 @@ onMounted(() => {
     list.value!.querySelectorAll<HTMLElement>('.refus__row').forEach((row) => {
       gsap
         .timeline({
-          scrollTrigger: { trigger: row, start: 'top 82%', end: 'top 50%', scrub: true }
+          scrollTrigger: { trigger: row, start: 'top 80%', end: 'top 42%', scrub: true }
         })
-        .fromTo(row.querySelector('.refus__strike'), { scaleX: 0 }, { scaleX: 1, ease: 'none' })
-        // La couleur, pas l'opacité : le trait est dans le mot et doit rester vif.
+        .to(row.querySelectorAll('.refus__char'), {
+          opacity: 0.1,
+          filter: 'blur(6px)',
+          yPercent: -8,
+          ease: 'none',
+          stagger: 0.04
+        })
         .fromTo(
-          row.querySelector('.refus__word'),
-          { color: 'rgba(243, 242, 239, 1)' },
-          { color: 'rgba(243, 242, 239, 0.35)', ease: 'none' },
-          0.3
+          row.querySelector('.refus__why'),
+          // En y et non en x : sur téléphone, un décalage latéral sortait de l'écran.
+          { autoAlpha: 0.15, y: 14 },
+          { autoAlpha: 1, y: 0, ease: 'none' },
+          0.15
         )
-        .fromTo(row.querySelector('.refus__why'), { autoAlpha: 0.15, x: 24 }, { autoAlpha: 1, x: 0, ease: 'none' }, 0.3)
     })
   }, list.value)
 })
@@ -86,18 +97,21 @@ onUnmounted(() => ctx?.revert())
   line-height: 1;
   letter-spacing: -0.04em;
   color: var(--on-night);
-  /* Une seule ligne par mot : le trait est tiré à mi-hauteur de la boîte. */
   white-space: nowrap;
 }
-.refus__strike {
+/* inline-block : une lettre doit pouvoir bouger et se flouter ; `pre` garde les espaces. */
+.refus__char {
+  display: inline-block;
+  white-space: pre;
+  will-change: opacity, filter, transform;
+}
+.refus__sr {
   position: absolute;
-  left: -0.06em;
-  right: -0.06em;
-  top: 54%;
-  height: 0.11em;
-  border-radius: 999px;
-  background: var(--accent);
-  transform-origin: left center;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 .refus__why {
   font-family: var(--font-mono);

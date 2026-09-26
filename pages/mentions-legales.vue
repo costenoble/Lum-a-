@@ -35,7 +35,7 @@ const blocks = [
   {
     title: 'Propriété intellectuelle',
     paragraphs: [
-      'L’ensemble des contenus (textes, visuels, rendus 3D, identité) est la propriété de Luméa.',
+      'L’ensemble des contenus (textes, photos, visuels, identité) est la propriété de Luméa.',
       'Toute reproduction sans autorisation écrite est interdite.'
     ]
   },

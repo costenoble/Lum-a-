@@ -17,14 +17,14 @@ npm run generate # version 100 % statique
 
 | Route | Contenu |
 | --- | --- |
-| `/` | Hero vidéo plein écran qui rétrécit en carte au défilement, puis hero titré, manifeste, bouteille qui tourne au scroll, carrousel des six parfums, 3 nouveautés, savoir-faire, chiffres, teaser studio |
+| `/` | Hero vidéo plein écran qui rétrécit en carte au défilement, puis hero titré, manifeste, bouteille qui tourne au scroll, carrousel des six parfums, 3 nouveautés, bien-être, chiffres en couleur, teaser studio |
 | `/boissons` | Grille filtrable par gamme |
-| `/fabrication` | Frise « 48 heures » des six étapes (compteur d'heures au scroll), les refus barrés au scroll, une bouteille qui tourne, fiche technique |
+| `/fabrication` | Frise « 48 heures » des six étapes (compteur d'heures au scroll), les refus qui se dissolvent au scroll, une bouteille qui tourne, fiche technique |
 | `/coffret` | Composeur de coffret six bouteilles, partageable par URL |
 | `/boutique` | Packs, prix, ajout au panier (tiroir latéral) |
 | `/panier` | Page panier : lignes animées, récap, jauge de franco, confirmation |
 | `/boissons/[slug]` | Fiche parfum façon étude de cas + parfum suivant |
-| `/savoir-faire` | 5 expertises (survol avec vignette), méthode, planche de rendus |
+| `/savoir-faire` | « Que du fruit » : cinq engagements bien-être (survol avec vignette), méthode, les six parfums |
 | `/studio` | Histoire, valeurs, repères |
 | `/contact` | Formulaire (sans backend) + coordonnées |
 | `/mentions-legales` | Texte de démonstration à remplacer |
@@ -53,9 +53,10 @@ npm run generate # version 100 % statique
     piste (`PACE` = pixels de scroll par pixel de glisse), recalculée à chaque `refreshInit` de
     ScrollTrigger. Sous 900 px et en mouvement réduit (`gsap.matchMedia`), les cartes s'empilent.
   - **Les refus** ([components/FabricationRefus.vue](components/FabricationRefus.vue)) : en section nuit,
-    ce qui n'entre jamais dans l'atelier (`refusals`, même fichier), en très gros ; chaque mot se fait
-    barrer au scroll pendant que sa raison s'allume. Sans JS ou en mouvement réduit, les mots sont
-    déjà barrés.
+    ce qui n'entre jamais dans l'atelier (`refusals`, même fichier), en très gros ; chaque mot se dissout
+    lettre par lettre au scroll (fondu + léger flou, de gauche à droite) pendant que sa raison
+    apparaît, et se reforme si l'on remonte. Le mot entier reste lu par les lecteurs d'écran (les
+    lettres sont `aria-hidden`). Sans JS ou en mouvement réduit, les mots restent lisibles.
   - **La bouteille** : un `BottleScroll` (même composant que Comète sur l'accueil), vidéo préparée par
     `scripts/bottle-video.py`. Le flacon est un essai MiniMax, pas un parfum du catalogue : le texte
     parle du contenant, jamais d'un fruit.
@@ -92,14 +93,16 @@ npm run generate # version 100 % statique
   n'apparaît qu'à la fin. `BottleScroll` fournit son avancement (0 → 1) à son emplacement (`v-slot`), et
   reste utilisable sans texte. Sur grand écran, le texte est à gauche et la vidéo est décalée de 20 vw vers
   la droite : un gros plan de la bouteille est un mur rouge sombre, il ne doit jamais passer derrière le
-  texte noir. Sur téléphone, le texte se pose en bas sur un voile de la couleur du fond, et la vidéo remonte
-  (`-17svh`).
+  texte noir. **Sur téléphone** (`stacked`, sous 900 px), bouteille et texte ne tiennent pas ensemble :
+  pendant la rotation (un peu plus courte), la bouteille a l'écran pour elle, en 16:9 à ~2/3 de la
+  hauteur (elle déborde sur les côtés, invisible puisque son fond est celui du site ; haut et bas fondus
+  par un `mask-image`), et le texte vient juste après, dans le flux normal. L'emplacement reçoit
+  `stacked` : sur l'accueil, le manifeste s'encre alors à son propre rythme de scroll.
   Reprend trois astuces du moteur scroll-world sans l'embarquer (il construit sa propre page et sa propre
   nav) : image clé toutes les 4 images, donc afficher n'importe quel instant, dans les deux sens, ne décode
   jamais plus de 3 images ; chargement en mémoire (Blob) avant usage ; un saut n'est jamais redemandé tant
   que le précédent n'est pas terminé. Rien ne charge avant que la section approche ; sous
-  `prefers-reduced-motion`, une image fixe. Sur téléphone la vidéo remplit l'écran (`cover`) : bouteille
-  entière grande et nette, gros plans qui débordent sur les côtés.
+  `prefers-reduced-motion`, une image fixe.
   **Le fond est celui du site, cuit dans la vidéo** par [scripts/bottle-video.py](scripts/bottle-video.py) :
   chaque image est détourée (bouteille, bouchon, étiquette, ombre au sol, verre clair) puis recomposée sur
   `--paper` (`#f3f2ef`). C'est une vidéo ordinaire, sans canal alpha ni shader, qui se fond dans la page ;
