@@ -4,8 +4,19 @@
       <NuxtLink to="/" class="header__brand" @click="navOpen = false">Luméa</NuxtLink>
 
       <div class="header__right">
-        <button class="header__cart link-under" @click="cartOpen = true">
-          Panier<sup v-if="count">{{ count }}</sup>
+        <button
+          class="header__cart"
+          :aria-label="count ? `Panier, ${count} pack${count > 1 ? 's' : ''}` : 'Panier, vide'"
+          @click="cartOpen = true"
+        >
+          <!-- Une corbeille à anse : un panier au sens propre, pour une marque de fruits. -->
+          <svg class="header__cartIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M7.5 10 11 3.8M16.5 10 13 3.8" />
+            <path d="M2.5 10h19" />
+            <path d="M4 10l1.5 8.3a2 2 0 0 0 2 1.7h9a2 2 0 0 0 2-1.7L20 10" />
+            <path d="M9.5 13.5v3M14.5 13.5v3" />
+          </svg>
+          <span v-if="count" class="header__cartCount" aria-hidden="true">{{ count }}</span>
         </button>
       </div>
     </div>
@@ -96,14 +107,48 @@ watch(navOpen, (open) => {
   /* place réservée à la pilule menu, qui est en position fixe hors du flux */
   padding-right: 9.5rem;
 }
+/* Le header est en mix-blend-mode: difference (blanc = encre inversée) : icône et
+   pastille restent donc en blanc/noir, jamais en couleur (l'orange y virerait au bleu). */
 .header__cart {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  transition: transform 0.3s var(--ease-soft);
 }
-.header__cart sup {
-  margin-left: 0.35rem;
+.header__cart:hover {
+  transform: scale(1.08);
+}
+.header__cart:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+.header__cartIcon {
+  width: 26px;
+  height: 26px;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* Nombre de packs : pastille pleine, chiffre « évidé » (noir = couleur de la page). */
+.header__cartCount {
+  position: absolute;
+  top: 3px;
+  right: 1px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #fff;
+  color: #000;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 500;
+  line-height: 18px;
+  text-align: center;
 }
 
 /* --- pilule menu --------------------------------------------------------- */
