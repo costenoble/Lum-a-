@@ -13,12 +13,6 @@
         <span class="line-mask"><span>pour les petits</span></span>
       </h1>
 
-      <!-- Bouteille 3D : purement décorative. @tresjs/nuxt ne monte le canvas
-           que côté client, le rendu serveur n'en contient rien. -->
-      <div class="hero__bottle">
-        <BottleCanvas :label="hero.name" :color="hero.color" :color2="hero.color2" />
-      </div>
-
       <div class="hero__bottom">
         <p class="lead" v-reveal="0.5">
           Six parfums pressés à froid, zéro sucre ajouté, et un univers dessiné pour que
@@ -161,10 +155,7 @@ const featured = computed(() => drinks.slice(0, 3))
 // et la bouteille finit seule, sur son dernier plan.
 const inkProgress = (p: number) => Math.min(1, Math.max(0, (p - 0.06) / 0.76))
 
-// Parfum mis en scène en 3D dans le hero.
-const hero = drinks[0]!
-
-// Heure locale du visiteur : la bouteille 3D s'éclaire au même barème.
+// Heure locale du visiteur, et le moment de la journée qui va avec.
 const now = ref('')
 const moment = ref('')
 onMounted(() => {
@@ -195,24 +186,10 @@ const carouselItems = computed(() =>
 </script>
 
 <style scoped>
-/* La bouteille occupe la droite du hero, sous le titre dans l'ordre de
-   superposition : le texte reste toujours lisible par-dessus. */
-.hero {
-  position: relative;
-}
 /* Le hero suit la carte vidéo : plus besoin de le faire remplir un écran entier. */
 .hero--after-video {
   min-height: auto;
   padding-top: 2rem;
-}
-.hero__bottle {
-  position: absolute;
-  top: 46%;
-  right: calc(var(--pad-inline) - 2vw);
-  translate: 0 -50%;
-  width: min(28vw, 360px);
-  z-index: 0;
-  pointer-events: none;
 }
 .hero__aside {
   display: grid;
@@ -226,20 +203,6 @@ const carouselItems = computed(() =>
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--accent);
-}
-.hero__title,
-.hero__bottom,
-.hero .eyebrow {
-  position: relative;
-  z-index: 1;
-}
-@media (max-width: 900px) {
-  .hero__bottle {
-    position: static;
-    translate: none;
-    width: 70%;
-    margin: 2rem auto 0;
-  }
 }
 .manifesto-wrap {
   display: grid;

@@ -1,3 +1,0 @@
-Deposer ici les exports glTF/glb Blender, nommes par slug :
-solaire.glb, comete.glb, ...
-Puis renseigner model3d: "/models/solaire.glb" dans composables/useSite.ts.

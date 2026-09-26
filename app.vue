@@ -60,12 +60,14 @@ const pageTransition = {
       done()
       return
     }
+    // Rideau volontairement court (≈ 1 s aller-retour) : il rythme la navigation
+    // sans la faire attendre.
     gsap.to(overlayEl.value.querySelectorAll('span'), {
       scaleY: 1,
       transformOrigin: 'bottom',
-      duration: 0.5,
+      duration: 0.4,
       ease: 'power4.in',
-      stagger: 0.06,
+      stagger: 0.05,
       onComplete: () => {
         resetScroll()
         done()
@@ -80,10 +82,9 @@ const pageTransition = {
     gsap.to(overlayEl.value.querySelectorAll('span'), {
       scaleY: 0,
       transformOrigin: 'top',
-      duration: 0.65,
+      duration: 0.5,
       ease: 'power4.out',
-      stagger: 0.06,
-      delay: 0.05,
+      stagger: 0.05,
       onComplete: () => {
         ScrollTrigger.refresh()
         done()

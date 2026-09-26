@@ -1,9 +1,5 @@
 <template>
-  <footer class="night footer footer--fruits">
-    <!-- Les six personnages-fruits, debout sur l'arête du pied de page, qui se
-         penchent vers le curseur. -->
-    <FooterFruits />
-
+  <footer class="night footer">
     <div class="container">
       <p class="eyebrow">Parlons-en</p>
 
@@ -76,15 +72,3 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
-/* Repère de position pour FooterFruits, posé sur l'arête haute du pied de page. */
-.footer {
-  position: relative;
-}
-/* Les personnages débordent au-dessus du pied de page, sous le dernier contenu de la
-   page : celle-ci réserve exactement la hauteur qui manque (la hauteur des personnages,
-   moins le vide qu'une page a déjà en bas). */
-.footer--fruits {
-  margin-top: max(0px, calc(var(--footfruit-h) - var(--sp-6)));
-}
-</style>

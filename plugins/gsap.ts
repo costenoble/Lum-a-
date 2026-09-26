@@ -32,6 +32,11 @@ export default defineNuxtPlugin((nuxtApp) => {
       })
       gsap.ticker.lagSmoothing(0)
     }
+
+    // Les polices (Google Fonts, en `swap`) arrivent souvent après le premier calcul
+    // des positions : un titre qui change de hauteur décale tout ce qui suit, et les
+    // zones épinglées (hero vidéo, bouteilles) démarreraient au mauvais endroit.
+    document.fonts?.ready.then(() => ScrollTrigger.refresh())
   }
 
   nuxtApp.provide('lenis', lenis)
@@ -39,13 +44,21 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   // v-reveal : fondu + translation à l'entrée dans le viewport.
   // `v-reveal="0.15"` décale le départ (stagger manuel).
+  //
+  // Au SSR, la directive pose seulement `data-reveal` : main.css masque déjà ces
+  // blocs dans le HTML servi (quand JS est là). Sans cela, en arrivant directement
+  // sur une page, le texte s'affichait, disparaissait à l'hydratation, puis
+  // revenait en fondu. Au montage, GSAP prend le relais en style inline et
+  // l'attribut est retiré (il ne sert plus que de filet si JS ne démarre jamais).
   nuxtApp.vueApp.directive('reveal', {
+    getSSRProps: () => ({ 'data-reveal': '' }),
     mounted(el: HTMLElement, binding) {
       const delay = typeof binding.value === 'number' ? binding.value : 0
       // L'état masqué est posé tout de suite, la timeline seulement après le
       // loader : sinon les blocs au-dessus de la ligne de flottaison se
       // révèlent derrière le rideau, donc pour personne.
       gsap.set(el, { autoAlpha: 0, y: reduceMotion ? 0 : 40 })
+      el.removeAttribute('data-reveal')
       afterIntro(el, () => {
         ;(el as any).__tween = gsap.to(el, {
           autoAlpha: 1,
@@ -64,16 +77,22 @@ export default defineNuxtPlugin((nuxtApp) => {
   // Chaque enfant direct doit être une ligne (<span>) — on ne fait pas de
   // découpe typographique automatique, ce qui garde le HTML lisible et le
   // rendu SSR identique au rendu client.
+  // Même principe que v-reveal pour l'état de départ servi au SSR (`data-lines`).
   nuxtApp.vueApp.directive('lines', {
+    getSSRProps: () => ({ 'data-lines': '' }),
     mounted(el: HTMLElement, binding) {
       const inner = el.querySelectorAll<HTMLElement>('.line-mask > span')
-      if (!inner.length) return
+      if (!inner.length) return el.removeAttribute('data-lines')
       const delay = typeof binding.value === 'number' ? binding.value : 0
+      // `y: 0` explicite : GSAP relit sinon le translateY(110%) posé par main.css comme un
+      // décalage en pixels, qu'il garderait en plus de son yPercent (titre coincé en bas).
       if (reduceMotion) {
-        gsap.set(inner, { yPercent: 0, autoAlpha: 1 })
+        gsap.set(inner, { y: 0, yPercent: 0, autoAlpha: 1 })
+        el.removeAttribute('data-lines')
         return
       }
-      gsap.set(inner, { yPercent: 110 })
+      gsap.set(inner, { y: 0, yPercent: 110 })
+      el.removeAttribute('data-lines')
       afterIntro(el, () => {
         ;(el as any).__tween = gsap.to(inner, {
           yPercent: 0,

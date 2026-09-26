@@ -58,9 +58,6 @@ export interface Drink {
   /** Filtre CSS optionnel appliqué sur le render (ex. recolorer une vraie
       photo neutre vers la teinte signature quand aucun vrai render n'existe). */
   renderFilter?: string
-  /** Modèle glTF/glb exporté depuis Blender, dans /public/models/. Vide =
-      bouteille procédurale générée par BottleCanvas. */
-  model3d?: string
   intro: string
   story: string[]
   ingredients: string[]
@@ -81,7 +78,7 @@ export const drinks: Drink[] = [
     pack: 'Pack de 6 · 20 cl',
     color: '#ff8a3d',
     color2: '#ffd166',
-    render: '/renders/solaire.jpg',
+    render: '/renders/solaire.webp',
     intro:
       "Le goûter qui a la couleur de 17 h en été. Mangue pressée, abricot du Rhône, zéro sucre ajouté.",
     story: [
@@ -107,7 +104,7 @@ export const drinks: Drink[] = [
     pack: 'Pack de 6 · 25 cl',
     color: '#ff4f79',
     color2: '#ff9ec4',
-    render: '/renders/comete.jpg',
+    render: '/renders/comete.webp',
     intro:
       "Des bulles fines, calibrées pour chatouiller sans piquer. La première boisson festive qu'on peut vraiment donner à un enfant.",
     story: [
@@ -133,7 +130,7 @@ export const drinks: Drink[] = [
     pack: 'Pack de 6 · 20 cl',
     color: '#4fbf7a',
     color2: '#c6f08a',
-    render: '/renders/prairie.jpg',
+    render: '/renders/prairie.webp',
     intro:
       "Pommes de Savoie pressées à froid, menthe douce infusée douze heures. Le vert qui ne fait pas peur aux enfants.",
     story: [
@@ -159,7 +156,7 @@ export const drinks: Drink[] = [
     pack: 'Pack de 6 · 25 cl',
     color: '#2fc4c0',
     color2: '#9ef0e6',
-    render: '/renders/lagon.jpg',
+    render: '/renders/lagon.webp',
     // Pas de vraie boisson bleu-vert sans alcool ni marque visible trouvée en
     // photo libre de droits : on recolore une vraie photo de bouteille (jus
     // rouge neutre) vers la teinte signature plutot que d'inventer un rendu.
@@ -189,7 +186,7 @@ export const drinks: Drink[] = [
     pack: 'Pack de 6 · 20 cl',
     color: '#7b6cf6',
     color2: '#c3b5ff',
-    render: '/renders/nuage.jpg',
+    render: '/renders/nuage.webp',
     intro:
       "Avoine française, myrtilles sauvages, vanille de Madagascar. La boisson du soir, celle qui calme tout le monde.",
     story: [
@@ -215,7 +212,7 @@ export const drinks: Drink[] = [
     pack: 'Pack de 6 · 25 cl',
     color: '#ffb03d',
     color2: '#ffe2a8',
-    render: '/renders/aurore.jpg',
+    render: '/renders/aurore.webp',
     intro:
       'Notre premier parfum. Une infusion froide de fleur de sureau, adoucie à la pêche de vigne.',
     story: [
@@ -239,35 +236,35 @@ export const expertises = [
     title: 'Recette',
     desc: 'Formulation sans sucres ajoutés, validée par un panel de goûteurs de 3 à 10 ans.',
     color: '#ff8a3d',
-    image: '/expertise/recette.jpg'
+    image: '/expertise/recette.webp'
   },
   {
     idx: '02',
     title: 'Direction artistique',
     desc: 'Un univers graphique qui parle aux enfants sans infantiliser les parents.',
     color: '#ff4f79',
-    image: '/expertise/direction-artistique.jpg'
+    image: '/expertise/direction-artistique.webp'
   },
   {
     idx: '03',
     title: 'Packaging',
     desc: 'Verre consigné, étiquette monomatière, format pensé pour une main de cinq ans.',
     color: '#4fbf7a',
-    image: '/expertise/packaging.jpg'
+    image: '/expertise/packaging.webp'
   },
   {
     idx: '04',
     title: 'Image 3D',
     desc: 'Chaque bouteille est modélisée et rendue sous Blender avant d’exister en verre.',
     color: '#7b6cf6',
-    image: '/renders/solaire.jpg'
+    image: '/renders/solaire-640.webp'
   },
   {
     idx: '05',
     title: 'Retail & digital',
     desc: 'Du linéaire épicerie fine au site marchand, une seule et même grammaire visuelle.',
     color: '#2fc4c0',
-    image: '/expertise/retail-digital.jpg'
+    image: '/expertise/retail-digital.webp'
   }
 ]
 

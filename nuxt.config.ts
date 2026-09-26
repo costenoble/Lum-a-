@@ -5,10 +5,6 @@ export default defineNuxtConfig({
   // faire dans un build de production.
   devtools: { enabled: import.meta.dev },
 
-  // TresJS : couche déclarative au-dessus de Three.js. Le module s'occupe du
-  // rendu client-only du canvas et de l'auto-import des composants <Tres*>.
-  modules: ['@tresjs/nuxt'],
-
   css: ['~/assets/css/main.css'],
 
   // Emplacement réservé pour Stripe (server/api/checkout.post.ts) : aucune clé
@@ -31,6 +27,9 @@ export default defineNuxtConfig({
             "Luméa, marque lyonnaise de boissons pour enfants : six parfums pressés à froid, sans sucres ajoutés, en bouteille de verre consignée."
         }
       ],
+      // Posée avant le premier rendu : main.css ne masque les blocs animés
+      // (data-reveal, data-lines) que si JS tourne, sinon ils restent lisibles.
+      script: [{ innerHTML: "document.documentElement.classList.add('js')" }],
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'anonymous' },
@@ -44,5 +43,18 @@ export default defineNuxtConfig({
     // besoin de $lenis et du ref de l'overlay, pas exprimable ici.
   },
 
-  typescript: { strict: true }
+  typescript: { strict: true },
+
+  hooks: {
+    // Nuxt annonce en `prefetch` tout fichier importé par une page, vidéos comprises :
+    // sur l'accueil, la bouteille Comète (1,6 Mo) partait dès le HTML, en concurrence
+    // avec la vidéo du hero que le rideau d'intro attend. Les vidéos se chargent
+    // elles-mêmes au bon moment (HeroVideo tout de suite, BottleScroll à l'approche
+    // de sa section) : on les retire des annonces.
+    'build:manifest'(manifest) {
+      for (const chunk of Object.values(manifest)) {
+        if (chunk.assets) chunk.assets = chunk.assets.filter((file) => !file.endsWith('.mp4'))
+      }
+    }
+  }
 })

@@ -25,12 +25,9 @@ components/minimaxH3/bottle/lumea-scroll/videos/*
 !components/minimaxH3/bottle/lumea-scroll/videos/lumea_banana_v2.mp4
 !components/minimaxH3/bottle/lumea-scroll/videos/lumea_watermelon_v2.mp4
 
-# Dossier de référence (démo Vue + images de stock brutes) dont FooterFruits.vue
-# reprend le principe (un fruit qui penche vers le curseur) et les images, une fois
-# détourées : seul components/minimaxH3/piedPage/web/ (les .png détourés) est utilisé
-# par le site, pas le reste de ce dossier de référence.
-components/minimaxH3/piedPage/*
-!components/minimaxH3/piedPage/web/
+# Dossier de référence (démo Vue + images de stock brutes) des anciens fruits du pied de
+# page, retirés du site : plus rien de ce dossier n'est utilisé.
+components/minimaxH3/piedPage/
 
 .DS_Store
 __pycache__/

@@ -1,6 +1,15 @@
 <template>
   <figure class="media" :class="`ratio-${ratio}`">
-    <img v-if="src" :src="src" :alt="alt" loading="lazy" :style="imgStyle" />
+    <img
+      v-if="src"
+      :src="src"
+      :srcset="srcset"
+      :sizes="srcset ? sizes : undefined"
+      :alt="alt"
+      loading="lazy"
+      decoding="async"
+      :style="imgStyle"
+    />
 
     <!-- Emplacement render : dégradé signature du parfum + halo + initiale.
          Dès que le PNG Blender existe, on passe `src` et la boîte ne bouge pas. -->
@@ -24,6 +33,11 @@ const props = withDefaults(
     /** Filtre CSS optionnel (ex. recolorer une photo neutre vers la teinte
         signature quand aucun vrai render n'existe pour ce parfum). */
     filter?: string
+    /** Largeur affichée, pour le choix de la déclinaison (attribut `sizes`).
+        « auto » laisse le navigateur la mesurer lui-même (image lazy) ; ceux qui
+        ne le savent pas encore prennent la valeur suivante. À préciser quand
+        l'image change de largeur après coup (carrousel accordéon). */
+    sizes?: string
   }>(),
   {
     src: '',
@@ -31,11 +45,21 @@ const props = withDefaults(
     color: '#ff5b1f',
     color2: '#ffd166',
     ratio: '4x5',
-    filter: ''
+    filter: '',
+    sizes: 'auto, 100vw'
   }
 )
 
 const alt = computed(() => props.alt || `Bouteille Luméa ${props.label}`)
+
+// Chaque render existe en 320, 640, 960 et 1400 px (scripts/images-webp.sh) : une
+// vignette de panier n'a pas à télécharger l'image d'une fiche parfum.
+const RENDER = /^(\/renders\/[a-z]+)\.webp$/
+const srcset = computed(() => {
+  const base = props.src.match(RENDER)?.[1]
+  if (!base) return undefined
+  return [320, 640, 960].map((w) => `${base}-${w}.webp ${w}w`).concat(`${props.src} 1400w`).join(', ')
+})
 
 const imgStyle = computed(() => (props.filter ? { filter: props.filter } : undefined))
 

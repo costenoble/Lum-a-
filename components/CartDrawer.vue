@@ -2,10 +2,12 @@
   <div>
     <div class="cart-scrim" :class="{ 'is-on': open }" @click="open = false" />
 
-    <aside ref="cartEl" class="cart" :class="{ 'is-on': open }" :aria-hidden="!open" aria-label="Panier">
+    <!-- Fermé, le tiroir est `inert` : ni le clavier ni un lecteur d'écran ne peuvent
+         y entrer, alors qu'il est seulement poussé hors de l'écran. -->
+    <aside ref="cartEl" class="cart" :class="{ 'is-on': open }" :inert="!open" aria-label="Panier">
       <header class="cart__head">
         <p class="eyebrow">Panier ({{ count }})</p>
-        <button class="cart__close" @click="open = false">Fermer</button>
+        <button ref="closeEl" class="cart__close" @click="open = false">Fermer</button>
       </header>
 
       <p v-if="!detailed.length" class="cart__empty muted">
@@ -62,10 +64,23 @@
 const { detailed, count, total, open, setQty, remove, clear, restore } = useCart()
 
 const cartEl = ref<HTMLElement | null>(null)
+const closeEl = ref<HTMLElement | null>(null)
 const ordered = ref(false)
 
 // Le panier est relu une fois côté client, après l'hydratation.
 onMounted(restore)
+
+// Échap ferme le tiroir, comme le menu.
+onMounted(() => {
+  const onKey = (e: KeyboardEvent) => {
+    if (e.key === 'Escape' && open.value) open.value = false
+  }
+  window.addEventListener('keydown', onKey)
+  onUnmounted(() => window.removeEventListener('keydown', onKey))
+})
+
+/** Ce qui avait le focus avant l'ouverture (le lien Panier, un bouton Ajouter…). */
+let opener: HTMLElement | null = null
 
 // Aucun paiement branché : on confirme visuellement puis on vide. Brancher
 // ici l'appel au prestataire de paiement le moment venu.
@@ -83,14 +98,18 @@ watch(open, (isOpen) => {
   if (!import.meta.client) return
   document.body.classList.toggle('nav-locked', isOpen)
 
-  // Le focus ne doit jamais rester sur un lien/bouton qu'on masque (aria-hidden) :
-  // cliquer « Voir le panier » (NuxtLink) garde le focus dessus le temps que la
-  // navigation parte, pile au moment où `open` passe à false — Chrome bloque alors
-  // le aria-hidden et le signale en erreur console, à raison (un lecteur d'écran ne
-  // doit jamais perdre le focus sur du contenu qu'il ne peut plus annoncer).
-  if (!isOpen) {
+  // À l'ouverture, le focus entre dans le tiroir ; à la fermeture, il retourne d'où il
+  // venait. Il ne doit jamais rester sur un lien/bouton qu'on rend inerte : cliquer
+  // « Voir le panier » (NuxtLink) garde le focus dessus le temps que la navigation parte,
+  // pile au moment où `open` passe à false.
+  if (isOpen) {
+    opener = document.activeElement as HTMLElement | null
+    nextTick(() => closeEl.value?.focus({ preventScroll: true }))
+  } else {
     const active = document.activeElement as HTMLElement | null
     if (active && cartEl.value?.contains(active)) active.blur()
+    if (opener?.isConnected) opener.focus({ preventScroll: true })
+    opener = null
   }
 })
 </script>
@@ -123,11 +142,17 @@ watch(open, (isOpen) => {
   flex-direction: column;
   gap: var(--sp-3);
   transform: translateX(101%);
-  transition: transform 0.55s var(--ease-soft);
+  /* Masqué une fois sorti de l'écran (pas avant, sinon il disparaîtrait d'un coup). */
+  visibility: hidden;
+  transition:
+    transform 0.55s var(--ease-soft),
+    visibility 0s linear 0.55s;
   overflow-y: auto;
 }
 .cart.is-on {
   transform: translateX(0);
+  visibility: visible;
+  transition: transform 0.55s var(--ease-soft);
 }
 .cart__head {
   display: flex;

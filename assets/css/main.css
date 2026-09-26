@@ -84,14 +84,6 @@
   --radius-photo: 20px;
   --ease-soft: cubic-bezier(0.22, 0.9, 0.32, 1);
   --header-h: 84px;
-
-  /* Hauteur de la piste des fruits qui courent au-dessus du pied de page (FooterSprint).
-     Partagée : le pied de page en tire la place qu'il doit réserver. */
-  --sprint-h: clamp(180px, 30vw, 450px);
-  /* Hauteur des personnages-fruits debout sur l'arête du pied de page (FooterFruits) :
-     leurs images sont presque carrées (1024 x 943), donc nettement moins hautes que
-     larges. Partagée : le pied de page en tire la place qu'il doit réserver. */
-  --footfruit-h: clamp(48px, 6vw, 90px);
 }
 
 /* =====================================================================
@@ -183,10 +175,8 @@ h4 {
 /* =====================================================================
    LAYOUT PRIMITIVES
    ===================================================================== */
-/* Le contenu de la page passe toujours au-dessus des fruits du pied de page. Ils courent
-   dans une bande réservée, mais si une page laisse moins de place que prévu, ce sont eux
-   qui passent derrière un texte ou une photo, jamais l'inverse : derrière les fruits, il n'y
-   a alors que le fond du site. */
+/* Le contenu des pages forme son propre contexte d'empilement : aucun z-index posé dans
+   une page ne peut passer au-dessus du header, du menu, du panier ou du rideau. */
 main {
   position: relative;
   z-index: 1;
@@ -380,6 +370,26 @@ main {
 .line-mask > span {
   display: block;
   will-change: transform;
+}
+
+/* État de départ des révélations, dès le HTML servi (voir plugins/gsap.ts) : GSAP le
+   reprend en style inline au montage et retire l'attribut. Si JS ne démarre jamais, le
+   filet (animation retardée) rend le contenu lisible au bout de quelques secondes. */
+html.js [data-reveal] {
+  opacity: 0;
+  visibility: hidden;
+  animation: reveal-failsafe 0s 5s forwards;
+}
+html.js [data-lines] .line-mask > span {
+  transform: translateY(110%);
+  animation: reveal-failsafe 0s 5s forwards;
+}
+@keyframes reveal-failsafe {
+  to {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
 }
 
 /* =====================================================================

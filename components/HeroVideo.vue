@@ -45,8 +45,8 @@ import heroPoster from '~/components/minimaxH3/hero/hero-poster.jpg'
 // La zone est haute (1 + SCROLL écrans) et son contenu collant : pendant que
 // la page défile, la scène reste en place et un avancement `p` (0 → 1) pilote
 // la taille du cadre. À p = 1 la zone se termine, la scène se libère et remonte
-// avec le reste de la page. Comme FabricationScene et UniverseScene, rien n'est
-// animé « à la main » : tout se recalcule depuis `p`.
+// avec le reste de la page. Rien n'est animé « à la main » : tout se recalcule
+// depuis `p`.
 //
 // La vidéo brute est préparée par scripts/hero-video.sh (recompression + image
 // d'attente). Elle est muette, condition pour que les navigateurs autorisent la

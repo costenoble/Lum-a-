@@ -17,6 +17,7 @@
           ratio="4x5"
           :alt="item.alt ?? item.title"
           :filter="item.filter"
+          sizes="(max-width: 900px) 85vw, 60vw"
         />
       </div>
 
