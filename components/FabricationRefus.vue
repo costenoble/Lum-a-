@@ -30,8 +30,8 @@ import gsap from 'gsap'
 
 // ---------------------------------------------------------------------------
 // La liste de ce que Luméa refuse, en très gros. Chaque ligne entre net, avec sa
-// raison qui s'allume à côté ; une fois passé le milieu de l'écran, le mot se
-// dissout lettre par lettre (fondu, léger flou, de gauche à droite). Tout est lié
+// raison qui s'allume à côté ; arrivé tout en haut de l'écran, le mot se dissout
+// lettre par lettre (fondu, léger flou, de gauche à droite). Tout est lié
 // au scroll (scrub) : en remontant, le mot se reforme.
 //
 // Sans JS ou en mouvement réduit, les mots restent simplement lisibles.
@@ -59,15 +59,17 @@ onMounted(() => {
           scrollTrigger: { trigger: row, start: 'top 88%', end: 'top 68%', scrub: true }
         }
       )
-      // Le mot ne se dissout qu'une fois passé le milieu de l'écran, en montant vers le
-      // haut : tant qu'il est dans la moitié basse, il reste parfaitement lisible.
+      // Le mot ne se dissout qu'en arrivant tout en haut de l'écran, juste avant de
+      // passer sous le header : de 88 % à 26 % de la hauteur, la ligne entière (mot et
+      // raison) reste parfaitement lisible, et le mot suivant n'a pas encore bougé
+      // quand on finit de lire la raison du précédent.
       gsap.to(row.querySelectorAll('.refus__char'), {
         opacity: 0.1,
         filter: 'blur(6px)',
         yPercent: -8,
         ease: 'none',
         stagger: 0.04,
-        scrollTrigger: { trigger: row, start: 'top 50%', end: 'top 18%', scrub: true }
+        scrollTrigger: { trigger: row, start: 'top 26%', end: 'top 2%', scrub: true }
       })
     })
   }, list.value)
