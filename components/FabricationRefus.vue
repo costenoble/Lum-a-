@@ -29,10 +29,10 @@
 import gsap from 'gsap'
 
 // ---------------------------------------------------------------------------
-// La liste de ce que Luméa refuse, en très gros : à mesure qu'un mot monte dans
-// l'écran, il se dissout lettre par lettre (fondu, léger flou, de gauche à droite)
-// pendant que sa raison apparaît à côté. Tout est lié au scroll (scrub) : en
-// remontant, le mot se reforme.
+// La liste de ce que Luméa refuse, en très gros. Chaque ligne entre net, avec sa
+// raison qui s'allume à côté ; une fois passé le milieu de l'écran, le mot se
+// dissout lettre par lettre (fondu, léger flou, de gauche à droite). Tout est lié
+// au scroll (scrub) : en remontant, le mot se reforme.
 //
 // Sans JS ou en mouvement réduit, les mots restent simplement lisibles.
 // ---------------------------------------------------------------------------
@@ -46,24 +46,29 @@ onMounted(() => {
   if ($reduceMotion || !list.value) return
   ctx = gsap.context(() => {
     list.value!.querySelectorAll<HTMLElement>('.refus__row').forEach((row) => {
-      gsap
-        .timeline({
-          scrollTrigger: { trigger: row, start: 'top 80%', end: 'top 42%', scrub: true }
-        })
-        .to(row.querySelectorAll('.refus__char'), {
-          opacity: 0.1,
-          filter: 'blur(6px)',
-          yPercent: -8,
+      // La raison d'abord, dès que la ligne entre par le bas : on lit le mot (encore net)
+      // et sa raison ensemble. En y et non en x : sur téléphone, un décalage latéral
+      // sortait de l'écran.
+      gsap.fromTo(
+        row.querySelector('.refus__why'),
+        { autoAlpha: 0.15, y: 14 },
+        {
+          autoAlpha: 1,
+          y: 0,
           ease: 'none',
-          stagger: 0.04
-        })
-        .fromTo(
-          row.querySelector('.refus__why'),
-          // En y et non en x : sur téléphone, un décalage latéral sortait de l'écran.
-          { autoAlpha: 0.15, y: 14 },
-          { autoAlpha: 1, y: 0, ease: 'none' },
-          0.15
-        )
+          scrollTrigger: { trigger: row, start: 'top 88%', end: 'top 68%', scrub: true }
+        }
+      )
+      // Le mot ne se dissout qu'une fois passé le milieu de l'écran, en montant vers le
+      // haut : tant qu'il est dans la moitié basse, il reste parfaitement lisible.
+      gsap.to(row.querySelectorAll('.refus__char'), {
+        opacity: 0.1,
+        filter: 'blur(6px)',
+        yPercent: -8,
+        ease: 'none',
+        stagger: 0.04,
+        scrollTrigger: { trigger: row, start: 'top 50%', end: 'top 18%', scrub: true }
+      })
     })
   }, list.value)
 })
