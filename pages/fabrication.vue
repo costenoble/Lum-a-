@@ -74,8 +74,8 @@
 // du contenant, jamais d'un fruit, pour ne pas laisser croire qu'il est en vente.
 // ---------------------------------------------------------------------------
 
-import bottleVideo from '~/components/minimaxH3/bottle/web/fabrication-watermelon.mp4'
-import bottlePoster from '~/components/minimaxH3/bottle/web/fabrication-watermelon-poster.jpg'
+import bottleVideo from '~/components/minimaxH3/bottle/web/fabrication-banana.mp4'
+import bottlePoster from '~/components/minimaxH3/bottle/web/fabrication-banana-poster.jpg'
 
 useHead({ title: 'Fabrication — Luméa' })
 
