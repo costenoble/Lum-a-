@@ -19,7 +19,6 @@ npm run generate # version 100 % statique
 | --- | --- |
 | `/` | Hero vidéo plein écran qui rétrécit en carte au défilement, puis hero titré, manifeste, bouteille qui tourne au scroll, carrousel des six parfums, 3 nouveautés, bien-être, chiffres en couleur, teaser studio |
 | `/boissons` | Grille filtrable par gamme |
-| `/fabrication` | Frise « 48 heures » des six étapes (compteur d'heures au scroll), les refus qui se dissolvent au scroll, une bouteille qui tourne, fiche technique |
 | `/coffret` | Composeur de coffret six bouteilles, partageable par URL |
 | `/boutique` | Packs, prix, ajout au panier (tiroir latéral) |
 | `/panier` | Page panier : lignes animées, récap, jauge de franco, confirmation |
@@ -43,32 +42,11 @@ npm run generate # version 100 % statique
 - **Curseur maison** ([components/CustomCursor.vue](components/CustomCursor.vue)) : point qui suit
   la souris et devient une pastille libellée au survol de tout élément portant
   `data-cursor="Voir"`. Inactif au tactile et en `prefers-reduced-motion`.
-- **/fabrication en quatre temps** ([pages/fabrication.vue](pages/fabrication.vue)) :
-  - **Le chrono** ([components/FabricationChrono.vue](components/FabricationChrono.vue)) : six étapes,
-    du verger au carton (contenu : `fabricationSteps` dans [composables/useSite.ts](composables/useSite.ts)),
-    une carte par étape aux couleurs d'un parfum. Sur grand écran, la zone est haute et sa scène
-    collante (comme HeroVideo et BottleScroll) : le défilement fait glisser la piste de droite à
-    gauche, un compteur passe de 00 h à 48 h en suivant les heures des étapes, et les cartes qui
-    attendent leur tour restent en retrait. La hauteur de la zone vient de la longueur réelle de la
-    piste (`PACE` = pixels de scroll par pixel de glisse), recalculée à chaque `refreshInit` de
-    ScrollTrigger. Sous 900 px et en mouvement réduit (`gsap.matchMedia`), les cartes s'empilent.
-  - **Les refus** ([components/FabricationRefus.vue](components/FabricationRefus.vue)) : en section nuit,
-    ce qui n'entre jamais dans l'atelier (`refusals`, même fichier), en très gros ; chaque mot se dissout
-    lettre par lettre au scroll (fondu + léger flou, de gauche à droite) pendant que sa raison
-    apparaît, et se reforme si l'on remonte. Le mot entier reste lu par les lecteurs d'écran (les
-    lettres sont `aria-hidden`). Sans JS ou en mouvement réduit, les mots restent lisibles.
-  - **La bouteille** : un `BottleScroll` (même composant que Comète sur l'accueil), vidéo préparée par
-    `scripts/bottle-video.py`. Le flacon est un essai MiniMax, pas un parfum du catalogue : le texte
-    parle du contenant, jamais d'un fruit.
-  - **La fiche technique** et l'appel à composer un coffret.
-
-  Versions précédentes, dans l'historique Git seulement : « Univers de la Source » en SVG, couloir de
-  fruits en 3D, moteur plein écran « scroll-world », puis deux `BottleScroll` enchaînés.
 - **Hero vidéo** ([components/HeroVideo.vue](components/HeroVideo.vue)) : au chargement, le rideau se
   lève sur une vidéo MiniMax H3 en plein écran, titre superposé. En défilant, le cadre rétrécit en une
   carte arrondie calée sur la colonne du site (un gabarit invisible mesure sa place exacte, donc elle
   s'aligne à toutes les largeurs ; carte 4:5 sur téléphone), puis la zone se libère et le hero d'origine
-  arrive dessous. Même mécanique que la fabrication : une zone haute au contenu collant, un avancement
+  arrive dessous. Même mécanique que BottleScroll : une zone haute au contenu collant, un avancement
   0 → 1 fourni par GSAP, tout recalculé depuis lui. Le loader attend, au plus 3,5 s, que la vidéo puisse
   jouer (`heroReady` dans [composables/useIntro.ts](composables/useIntro.ts)) pour ne pas révéler un cadre
   noir. La vidéo est amorcée dès le montage (muette, sous le rideau) puis remise sur sa première image :
@@ -113,7 +91,7 @@ npm run generate # version 100 % statique
   couleur du décodage vidéo (`DISPLAY_OFFSET`, mesuré dans Chrome : sans cela, la vidéo apparaîtrait de 2 à
   3 niveaux plus claire que la page). `BottleScroll` est un composant à propriété (`src`, `poster`,
   `scroll` — hauteurs d'écran de rotation, 3 par défaut) : ajouter un parfum, c'est lancer le script sur
-  sa vidéo, puis poser un nouveau `<BottleScroll :src :poster>` là où on le veut (voir `/fabrication`).
+  sa vidéo, puis poser un nouveau `<BottleScroll :src :poster>` là où on le veut.
   Les fichiers de travail
   `components/minimaxH3/bottle/lumea-scroll/work/args_*.json` contiennent des liens signés : ne pas les
   versionner.

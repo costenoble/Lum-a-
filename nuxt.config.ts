@@ -47,6 +47,11 @@ export default defineNuxtConfig({
 
   typescript: { strict: true },
 
+  // /fabrication a été retirée : un lien déjà partagé mène à l'accueil plutôt qu'à une 404.
+  routeRules: {
+    '/fabrication': { redirect: { to: '/', statusCode: 301 } }
+  },
+
   hooks: {
     // Nuxt annonce en `prefetch` tout fichier importé par une page, vidéos comprises :
     // sur l'accueil, la bouteille Comète (1,6 Mo) partait dès le HTML, en concurrence

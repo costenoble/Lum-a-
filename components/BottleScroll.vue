@@ -48,7 +48,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 // épinglée fixe l'instant affiché, du bouchon vu d'en haut jusqu'au verre.
 //
 // Composant à propriété : src/poster viennent de l'appelant (la page
-// d'accueil pour Comète, /fabrication pour les deux autres bouteilles).
+// d'accueil pour Comète).
 // Rien ici ne connaît le nom d'un parfum en particulier.
 //
 // Comme HeroVideo, la zone est haute et son contenu collant. Trois astuces,
