@@ -79,11 +79,12 @@ npm run generate # version 100 % statique
   elle ne force rien et repart au premier toucher, clic ou touche : on respecte la politique du
   navigateur. En pause hors écran ; sous `prefers-reduced-motion`, une
   carte fixe, sans zone collante.
-  La vidéo brute ([components/minimaxH3/hero/](components/minimaxH3/hero/), 2262 × 960, la plus récente) est recompressée
-  avec son image d'attente par [scripts/hero-video.sh](scripts/hero-video.sh), qui écarte aussi les
-  premières images touchées par le filigrane du fournisseur (`START_FRAME` dans le script — son
-  compte dépend de la vidéo brute, à revérifier à chaque nouvelle génération plutôt qu'à supposer
-  inchangé).
+  La vidéo brute ([components/minimaxH3/hero/lumea_animation.mp4](components/minimaxH3/hero/lumea_animation.mp4),
+  1376 × 768 : les personnages-fruits qui courent vers le cristal) est recompressée avec son image
+  d'attente par [scripts/hero-video.sh](scripts/hero-video.sh). Le script peut écarter les premières
+  images si une vidéo porte le filigrane du fournisseur (`START_FRAME`) ; celle-ci n'en a pas, il est
+  à 0 — à revérifier à chaque nouvelle génération. Si le format change, ajuster `RATIO` dans
+  HeroVideo.vue (et l'`aspect-ratio` de la carte fixe, en mouvement réduit).
 - **Manifeste sur la bouteille qui tourne** ([components/BottleScroll.vue](components/BottleScroll.vue)) : sur
   l'accueil, la section « La marque » est épinglée sur une bouteille posée directement sur le fond du
   site. Le défilement de la zone épinglée fait à la fois tourner la bouteille (la vidéo n'est pas lue mais

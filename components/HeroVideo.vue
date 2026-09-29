@@ -57,7 +57,7 @@ const SRC = heroSrc
 const POSTER = heroPoster
 
 /** Format de la vidéo, pour la carte d'arrivée sur grand écran. */
-const RATIO = 2262 / 960
+const RATIO = 1376 / 768
 /** Sur téléphone la carte est plus haute que large : un plan de cinéma y serait minuscule. */
 const NARROW = 700
 const NARROW_RATIO = 4 / 5
@@ -349,7 +349,7 @@ onUnmounted(() => {
   top: auto;
   width: 100%;
   height: auto;
-  aspect-ratio: 2262 / 960;
+  aspect-ratio: 1376 / 768;
   border-radius: 28px;
 }
 .hv--static .hv__overlay {
