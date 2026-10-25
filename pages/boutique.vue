@@ -59,7 +59,7 @@
 
 <script setup lang="ts">
 useHead({
-  title: 'Boutique — Luméa',
+  title: 'Boutique Luméa : packs de 6 bouteilles livrés sous 48 h',
   meta: [
     {
       name: 'description',

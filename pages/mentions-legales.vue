@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 useHead({
-  title: 'Mentions légales — Luméa',
+  title: 'Mentions légales Luméa : éditeur et données personnelles',
   meta: [
     {
       name: 'description',
