@@ -100,7 +100,15 @@
 import gsap from 'gsap'
 import type { Drink } from '~/composables/useSite'
 
-useHead({ title: 'Coffret sur mesure — Luméa' })
+useHead({
+  title: 'Coffret sur mesure — Luméa',
+  meta: [
+    {
+      name: 'description',
+      content: 'Composez votre coffret Luméa de six bouteilles, dans l’ordre que vous voulez. Huit pour cent moins cher qu’à l’unité, partageable par lien.'
+    }
+  ]
+})
 
 const SIZE = 6
 

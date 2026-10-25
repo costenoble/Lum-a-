@@ -65,7 +65,15 @@
 </template>
 
 <script setup lang="ts">
-useHead({ title: 'Contact — Luméa' })
+useHead({
+  title: 'Contact — Luméa',
+  meta: [
+    {
+      name: 'description',
+      content: 'Une question, une demande de revendeur ou de presse ? Écrivez à l’équipe Luméa, à Lyon : réponse sous 48 h, par e-mail ou par téléphone.'
+    }
+  ]
+})
 
 const form = reactive({ name: '', email: '', subject: '', message: '' })
 const sent = ref(false)

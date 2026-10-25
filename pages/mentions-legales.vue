@@ -15,7 +15,15 @@
 </template>
 
 <script setup lang="ts">
-useHead({ title: 'Mentions légales — Luméa' })
+useHead({
+  title: 'Mentions légales — Luméa',
+  meta: [
+    {
+      name: 'description',
+      content: 'Mentions légales du site Luméa : éditeur, hébergement, propriété intellectuelle et données personnelles collectées via le formulaire de contact.'
+    }
+  ]
+})
 
 // Contenu de démonstration : à remplacer par les informations réelles de la
 // société avant toute mise en ligne.

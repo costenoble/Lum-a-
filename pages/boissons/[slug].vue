@@ -120,7 +120,15 @@ if (!drink) {
 const next = nextDrink(drink.slug)
 const { add } = useCart()
 
-useHead({ title: `${drink.name} — ${drink.fruit} · Luméa` })
+useHead({
+  title: `${drink.name} — ${drink.fruit} · Luméa`,
+  meta: [
+    {
+      name: 'description',
+      content: `Parfum ${drink.name} (${drink.fruit}) : pressé à froid, sans sucre ajouté, en bouteille de verre consignée. Découvrez la recette de Luméa.`
+    }
+  ]
+})
 </script>
 
 <style scoped>

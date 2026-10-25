@@ -35,7 +35,15 @@
 </template>
 
 <script setup lang="ts">
-useHead({ title: 'La gamme — Luméa' })
+useHead({
+  title: 'La gamme — Luméa',
+  meta: [
+    {
+      name: 'description',
+      content: 'Les six parfums Luméa, pressés à froid et sans sucre ajouté. Filtrez la gamme par famille et trouvez la boisson qui plaît à votre enfant.'
+    }
+  ]
+})
 
 const active = ref<string | null>(null)
 
