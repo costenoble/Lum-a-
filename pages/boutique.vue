@@ -58,7 +58,15 @@
 </template>
 
 <script setup lang="ts">
-useHead({ title: 'Boutique — Luméa' })
+useHead({
+  title: 'Boutique — Luméa',
+  meta: [
+    {
+      name: 'description',
+      content: 'Commandez les packs de six bouteilles Luméa, expédiés sous 48 h en France. Consigne incluse, livraison offerte dès 40 €, retour en point de vente.'
+    }
+  ]
+})
 
 const { add } = useCart()
 </script>
