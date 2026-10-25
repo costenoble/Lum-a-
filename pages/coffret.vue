@@ -100,7 +100,7 @@
 import gsap from 'gsap'
 import type { Drink } from '~/composables/useSite'
 
-useHead({ title: 'Coffret sur mesure — Luméa' })
+useHead({ title: 'Coffret de 6 boissons à composer, 8 % moins cher — Luméa' })
 
 const SIZE = 6
 

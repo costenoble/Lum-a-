@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-useHead({ title: 'Savoir-faire — Luméa' })
+useHead({ title: 'Savoir-faire : fruits pressés à froid, sans sucre — Luméa' })
 
 const method = [
   {

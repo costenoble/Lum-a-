@@ -58,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-useHead({ title: 'Boutique — Luméa' })
+useHead({ title: 'Packs de 6 boissons, livraison offerte dès 40 € — Luméa' })
 
 const { add } = useCart()
 </script>

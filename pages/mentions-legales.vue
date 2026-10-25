@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-useHead({ title: 'Mentions légales — Luméa' })
+useHead({ title: 'Mentions légales : éditeur, hébergement, données — Luméa' })
 
 // Contenu de démonstration : à remplacer par les informations réelles de la
 // société avant toute mise en ligne.

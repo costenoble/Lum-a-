@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-useHead({ title: 'La gamme — Luméa' })
+useHead({ title: 'La gamme : six parfums pressés à froid, sans sucre — Luméa' })
 
 const active = ref<string | null>(null)
 

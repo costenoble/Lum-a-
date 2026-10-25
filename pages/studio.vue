@@ -70,7 +70,7 @@
 </template>
 
 <script setup lang="ts">
-useHead({ title: 'Le studio — Luméa' })
+useHead({ title: 'Le studio : toutes nos boissons pressées à Lyon — Luméa' })
 
 const values = [
   {

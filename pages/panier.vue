@@ -240,7 +240,7 @@
 <script setup lang="ts">
 import gsap from 'gsap'
 
-useHead({ title: 'Panier — Luméa' })
+useHead({ title: 'Votre panier : packs sans sucre, livraison dès 40 € — Luméa' })
 
 const { detailed, count, total, setQty, remove, clear, restore } = useCart()
 const { customer, restore: restoreCustomer, persist: persistCustomer } = useCheckoutCustomer()
