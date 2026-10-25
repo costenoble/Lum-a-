@@ -66,7 +66,7 @@
 
 <script setup lang="ts">
 useHead({
-  title: 'Contact — Luméa',
+  title: 'Contact Luméa : réponse sous 48 h, à Lyon',
   meta: [
     {
       name: 'description',

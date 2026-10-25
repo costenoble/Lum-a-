@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 useHead({
-  title: 'La gamme — Luméa',
+  title: 'La gamme Luméa : six boissons sans sucre ajouté',
   meta: [
     {
       name: 'description',
