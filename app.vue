@@ -30,6 +30,14 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 // ---------------------------------------------------------------------------
 
 const navOpen = useNavOpen()
+
+// Canonical commune à toutes les pages : elle pointe vers l'adresse de la page courante
+// (sans query string) sur le domaine du site. Couvre aussi les routes dynamiques (/boissons/[slug]).
+const siteUrl = 'https://lum-a-iota.vercel.app'
+const route = useRoute()
+useHead({
+  link: [{ rel: 'canonical', href: computed(() => siteUrl + route.path) }]
+})
 const { $lenis, $reduceMotion } = useNuxtApp()
 const overlayEl = ref<HTMLElement | null>(null)
 
